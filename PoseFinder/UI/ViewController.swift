@@ -147,7 +147,7 @@ class ViewController: UIViewController {
     
     private func setupAndBeginCapturingMovieFrames() {
       let asset = AVAsset(url: Bundle.main.url(forResource: "traning", withExtension: "mp4")!)
-      let composition = AVVideoComposition(asset: asset, applyingCIFiltersWithHandler: { request in
+        let composition = AVVideoComposition(asset: asset, applyingCIFiltersWithHandler: { [self] request in
 //          print("test")
 //          let source = request.sourceImage.clampedToExtent()
           defer {
@@ -167,13 +167,16 @@ class ViewController: UIViewController {
               // UIImage to VisionImage
               let visionImage = VisionImage(image: uiImage)
               
+              moviePreviewImageView.image = uiImage
               // ポーズ検出処理
               self.moviePoseDetector.process(visionImage) {detectedPoses, error in
                   guard error == nil else {
+                      self.movieCurrentFrame = nil
                     // Error.
                     return
                   }
                     guard let poses = detectedPoses, !poses.isEmpty else {
+                        self.movieCurrentFrame = nil
                     // No pose detected.
                     return
                   }
@@ -183,9 +186,11 @@ class ViewController: UIViewController {
                       let leftAnkleLandmark = pose.landmark(ofType: .leftAnkle)
                       if leftAnkleLandmark.inFrameLikelihood > 0.5 {
                         let position = leftAnkleLandmark.position
+                          print("detect from movie:")
                           print(position)
                       }
                     }
+                  self.movieCurrentFrame = nil
                 }
           }
 
@@ -298,6 +303,7 @@ extension ViewController: VideoCaptureDelegate {
         guard let image = capturedImage else {
             fatalError("Captured image is null")
         }
+        self.videoCurrentFrame = image
         
         //CGImage to UIImage
         let uiImage = UIImage(cgImage: image)
@@ -305,14 +311,18 @@ extension ViewController: VideoCaptureDelegate {
         //UIImage to VisionImage
         let visionImage = VisionImage(image: uiImage)
         
+        self.videoPreviewImageView.image = uiImage
+        
         // ポーズ検出処理
         videoPoseDetector.process(visionImage) { detectedPoses, error in
           guard error == nil else {
+              self.videoCurrentFrame = nil
             // Error.
               print("error in video")
             return
           }
             guard let poses = detectedPoses, !poses.isEmpty else {
+                self.videoCurrentFrame = nil
             // No pose detected.
                 print("no pose in video")
             return
@@ -323,9 +333,11 @@ extension ViewController: VideoCaptureDelegate {
               let leftAnkleLandmark = pose.landmark(ofType: .leftAnkle)
               if leftAnkleLandmark.inFrameLikelihood > 0.5 {
                 let position = leftAnkleLandmark.position
+                  print("detect from video:")
                   print(position)
               }
             }
+            self.videoCurrentFrame = nil
         }
         
     }
