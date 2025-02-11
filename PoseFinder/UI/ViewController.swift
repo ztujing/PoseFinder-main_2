@@ -150,24 +150,32 @@ class ViewController: UIViewController {
         let composition = AVVideoComposition(asset: asset, applyingCIFiltersWithHandler: { [self] request in
 //          print("test")
 //          let source = request.sourceImage.clampedToExtent()
-          defer {
-              request.finish(with: request.sourceImage, context: nil)
-          }
-                  
-          guard self.movieCurrentFrame == nil else {
-              return
-          }
-          let source = request.sourceImage
+            
+            let source = request.sourceImage
+            guard let cgImage = source.toCGImage() else {
+                return
+            }
+            // CGImage to UIImage
+            let uiImage = UIImage(cgImage: cgImage)
+            
+//            moviePreviewImageView.image = uiImage
+            
+              defer {
+                  request.finish(with: request.sourceImage, context: nil)
+              }
+                      
+              guard self.movieCurrentFrame == nil else {
+                  return
+              }
+          
           //コマ落ちしても良い
-          if let cgImage = source.toCGImage() {
+
               self.movieCurrentFrame = cgImage
               
-              // CGImage to UIImage
-              let uiImage = UIImage(cgImage: cgImage)
+
               // UIImage to VisionImage
               let visionImage = VisionImage(image: uiImage)
               
-              moviePreviewImageView.image = uiImage
               // ポーズ検出処理
               self.moviePoseDetector.process(visionImage) {detectedPoses, error in
                   guard error == nil else {
@@ -194,7 +202,7 @@ class ViewController: UIViewController {
                 }
           }
 
-      })
+      )
       let playerItem = AVPlayerItem(asset: asset)
       playerItem.videoComposition = composition
 
@@ -297,22 +305,26 @@ extension ViewController: ConfigurationViewControllerDelegate {
 
 extension ViewController: VideoCaptureDelegate {
     func videoCapture(_ videoCapture: VideoCapture, didCaptureFrame capturedImage: CGImage?) {
-        guard videoCurrentFrame == nil else {
-            return
-        }
+        
         guard let image = capturedImage else {
             fatalError("Captured image is null")
         }
-        self.videoCurrentFrame = image
         
         //CGImage to UIImage
         let uiImage = UIImage(cgImage: image)
         
-        //UIImage to VisionImage
-        let visionImage = VisionImage(image: uiImage)
-        
         self.videoPreviewImageView.image = uiImage
         
+        
+        guard videoCurrentFrame == nil else {
+            return
+        }
+
+        self.videoCurrentFrame = image
+        
+        //UIImage to VisionImage
+        let visionImage = VisionImage(image: uiImage)
+                
         // ポーズ検出処理
         videoPoseDetector.process(visionImage) { detectedPoses, error in
           guard error == nil else {
