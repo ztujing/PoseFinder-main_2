@@ -1,10 +1,10 @@
 /*
-See LICENSE folder for this sample’s licensing information.
-
-Abstract:
-The implementation of the application's view controller, responsible for coordinating
+ See LICENSE folder for this sample’s licensing information.
+ 
+ Abstract:
+ The implementation of the application's view controller, responsible for coordinating
  the user interface, video feed, and PoseNet model.
-*/
+ */
 
 import AVFoundation
 import UIKit
@@ -20,10 +20,10 @@ extension CIImage {
     }
 }
 final class TeacherStudentRatio {
-  // インスタンスを参照するためのプロパティ
-  static let shared = TeacherStudentRatio ()
-
-  // ここに変数を列挙するはじめは0を入れておいてよい。
+    // インスタンスを参照するためのプロパティ
+    static let shared = TeacherStudentRatio ()
+    
+    // ここに変数を列挙するはじめは0を入れておいてよい。
     var originToRightShoulder = 1.0;
     var rightShoulderToRightElbow = 1.0;
     var rightElbowToRightWrist = 1.0;
@@ -39,34 +39,34 @@ final class TeacherStudentRatio {
     var leftKneeToLeftAnkle = 1.0;
     var midpointOfShouldersToLeftEar = 1.0;
     
-
-  // イニシャライズ
-  private init() {
-     // 今回は定数を代入する。いずれは、ローカルのDBかファイルに保存しておいて読み込むようにする。
-//      self.originToRightShoulder = 0.9042862676;
-//      self.rightShoulderToRightElbow = 1.245541657;
-//      self.rightElbowToRightWrist = 0.8226015546;
-//      self.originToRightHip = 0.9789301811;
-//      self.rightHipToRightKnee = 1.253915664;
-//      self.rightKneeToRightAnkle = 1.247329766;
-//      self.midpointOfShouldersToRightEar = 0.8929083536;
-//      self.originToLeftShoulder = 0.9518434667;
-//      self.leftShoulderToLeftElbow = 1.094948532;
-//      self.leftElbowToLeftWrist = 1.165524656;
-//      self.originToLeftHip = 0.9649565827;
-//      self.leftHipToLeftKnee = 1.168294556;
-//      self.leftKneeToLeftAnkle = 1.185906149;
-//      self.midpointOfShouldersToLeftEar = 0.8855039207;
-      
-
-
-  }
+    
+    // イニシャライズ
+    private init() {
+        // 今回は定数を代入する。いずれは、ローカルのDBかファイルに保存しておいて読み込むようにする。
+        //      self.originToRightShoulder = 0.9042862676;
+        //      self.rightShoulderToRightElbow = 1.245541657;
+        //      self.rightElbowToRightWrist = 0.8226015546;
+        //      self.originToRightHip = 0.9789301811;
+        //      self.rightHipToRightKnee = 1.253915664;
+        //      self.rightKneeToRightAnkle = 1.247329766;
+        //      self.midpointOfShouldersToRightEar = 0.8929083536;
+        //      self.originToLeftShoulder = 0.9518434667;
+        //      self.leftShoulderToLeftElbow = 1.094948532;
+        //      self.leftElbowToLeftWrist = 1.165524656;
+        //      self.originToLeftHip = 0.9649565827;
+        //      self.leftHipToLeftKnee = 1.168294556;
+        //      self.leftKneeToLeftAnkle = 1.185906149;
+        //      self.midpointOfShouldersToLeftEar = 0.8855039207;
+        
+        
+        
+    }
     public static func getInstance() -> TeacherStudentRatio {
-    return shared;
-  }
-//    public func getScaledPoses(pose: Pose) -> Pose {
-//
-//    }
+        return shared;
+    }
+    //    public func getScaledPoses(pose: Pose) -> Pose {
+    //
+    //    }
 }
 class ViewController: UIViewController {
     /// The view the controller uses to visualize the detected poses.
@@ -76,55 +76,55 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var ScoreLabel: UILabel!
     private let videoCapture = VideoCapture()
-
-//    private var videoPoseNet: PoseNet!
-//    private var moviePoseNet: PoseNet!
- 
+    
+    //    private var videoPoseNet: PoseNet!
+    //    private var moviePoseNet: PoseNet!
+    
     // 変更
     private var videoPoseDetector: PoseDetector!
     private var moviePoseDetector: PoseDetector!
-
+    
     /// The frame the PoseNet model is currently making pose predictions from.
     private var videoCurrentFrame: CGImage?
     private var movieCurrentFrame: CGImage?
     
     /// The algorithm the controller uses to extract poses from the current frame.
     private var algorithm: Algorithm = .single
-
+    
     /// The set of parameters passed to the pose builder when detecting poses.
     private var poseBuilderConfiguration = PoseBuilderConfiguration()
-
+    
     private var popOverPresentationManager: PopOverPresentationManager?
-
+    
     private var playerLayer:AVPlayerLayer!
     private var player:AVPlayer!
     @IBOutlet weak var playerView: PlayerView!
     
     //teacherScaledPoseプロパティを追加
-     var teacherPose: Pose = Pose()
+    var teacherPose: Pose = Pose()
     
-
+    
     override func viewDidLoad() {
-      super.viewDidLoad()
-
-      // For convenience, the idle timer is disabled to prevent the screen from locking.
-      UIApplication.shared.isIdleTimerDisabled = true
-
-//      do {
-//          videoPoseNet = try PoseNet(type: "video")
-//          moviePoseNet = try PoseNet(type: "movie")
-//
-//      } catch {
-//        fatalError("Failed to load model. \(error.localizedDescription)")
-//      }
-
-//      videoPoseNet.delegate = self
-//      moviePoseNet.delegate = self
+        super.viewDidLoad()
         
-    // 追加
-      setupPoseDetectors()
-      setupAndBeginCapturingVideoFrames()
-      setupAndBeginCapturingMovieFrames()
+        // For convenience, the idle timer is disabled to prevent the screen from locking.
+        UIApplication.shared.isIdleTimerDisabled = true
+        
+        //      do {
+        //          videoPoseNet = try PoseNet(type: "video")
+        //          moviePoseNet = try PoseNet(type: "movie")
+        //
+        //      } catch {
+        //        fatalError("Failed to load model. \(error.localizedDescription)")
+        //      }
+        
+        //      videoPoseNet.delegate = self
+        //      moviePoseNet.delegate = self
+        
+        // 追加
+        setupPoseDetectors()
+        setupAndBeginCapturingVideoFrames()
+        setupAndBeginCapturingMovieFrames()
     }
     
     //追加　Viewのサイズを揃える
@@ -146,10 +146,10 @@ class ViewController: UIViewController {
     }
     
     private func setupAndBeginCapturingMovieFrames() {
-      let asset = AVAsset(url: Bundle.main.url(forResource: "traning", withExtension: "mp4")!)
+        let asset = AVAsset(url: Bundle.main.url(forResource: "traning", withExtension: "mp4")!)
         let composition = AVVideoComposition(asset: asset, applyingCIFiltersWithHandler: { [self] request in
-//          print("test")
-//          let source = request.sourceImage.clampedToExtent()
+            //          print("test")
+            //          let source = request.sourceImage.clampedToExtent()
             
             let source = request.sourceImage
             guard let cgImage = source.toCGImage() else {
@@ -158,68 +158,72 @@ class ViewController: UIViewController {
             // CGImage to UIImage
             let uiImage = UIImage(cgImage: cgImage)
             
-//            moviePreviewImageView.image = uiImage
+            //            moviePreviewImageView.image = uiImage
             
-              defer {
-                  request.finish(with: request.sourceImage, context: nil)
-              }
-                      
-              guard self.movieCurrentFrame == nil else {
-                  return
-              }
-          
-          //コマ落ちしても良い
-
-              self.movieCurrentFrame = cgImage
-              
-
-              // UIImage to VisionImage
-              let visionImage = VisionImage(image: uiImage)
-              
-              // ポーズ検出処理
-              self.moviePoseDetector.process(visionImage) {detectedPoses, error in
-                  guard error == nil else {
-                      self.movieCurrentFrame = nil
+            defer {
+                request.finish(with: request.sourceImage, context: nil)
+            }
+            
+            guard self.movieCurrentFrame == nil else {
+                return
+            }
+            
+            //コマ落ちしても良い
+            
+            self.movieCurrentFrame = cgImage
+            
+            
+            // UIImage to VisionImage
+            let visionImage = VisionImage(image: uiImage)
+            
+            // ポーズ検出処理
+            self.moviePoseDetector.process(visionImage) {detectedPoses, error in
+                guard error == nil else {
+                    self.movieCurrentFrame = nil
                     // Error.
                     return
-                  }
-                    guard let poses = detectedPoses, !poses.isEmpty else {
-                        self.movieCurrentFrame = nil
+                }
+                guard let poses = detectedPoses, !poses.isEmpty else {
+                    self.movieCurrentFrame = nil
                     // No pose detected.
                     return
-                  }
-
-                  // Success. Get pose landmarks here.
-                    for pose in poses {
-                      let leftAnkleLandmark = pose.landmark(ofType: .leftAnkle)
-                      if leftAnkleLandmark.inFrameLikelihood > 0.5 {
-                        let position = leftAnkleLandmark.position
-                          print("detect from movie:")
-                          print(position)
-                      }
-                    }
-                  self.movieCurrentFrame = nil
                 }
-          }
-
-      )
-      let playerItem = AVPlayerItem(asset: asset)
-      playerItem.videoComposition = composition
-
-      self.player = AVPlayer(playerItem: playerItem)
-
-      self.playerLayer = AVPlayerLayer(player: player)
-      // 表示モードの設定
-      playerLayer.videoGravity = AVLayerVideoGravity.resizeAspect
-      playerLayer.contentsScale = UIScreen.main.scale
-
-      self.playerView.playerLayer = self.playerLayer
-      self.playerView.layer.insertSublayer(playerLayer, at: 0)
-
-      self.player.play()
-
-
-
+                guard let currentFrame = movieCurrentFrame else {
+                    return
+                }
+                var pose = poses[0]
+                // 3. PoseBuilderV2 を初期化して、内部の Pose オブジェクトを構築する
+                let builder = PoseBuilderV2(mlKitPose: pose, configuration: self.poseBuilderConfiguration)
+                
+                // 先生のポーズ
+                
+                self.teacherPose = builder.pose
+                
+                // moviePreviewImageView.show の呼び出しを修正
+                self.moviePreviewImageView.show(scaledPose: self.teacherPose, studentPose: self.teacherPose, on: currentFrame, isFrameDraw: true)
+                
+                self.movieCurrentFrame = nil
+            }
+        }
+                                             
+        )
+        let playerItem = AVPlayerItem(asset: asset)
+        playerItem.videoComposition = composition
+        
+        self.player = AVPlayer(playerItem: playerItem)
+        
+        self.playerLayer = AVPlayerLayer(player: player)
+        // 表示モードの設定
+        playerLayer.videoGravity = AVLayerVideoGravity.resizeAspect
+        playerLayer.contentsScale = UIScreen.main.scale
+        
+        self.playerView.playerLayer = self.playerLayer
+        self.playerView.layer.insertSublayer(playerLayer, at: 0)
+        
+        self.player.play()
+        
+        
+        
     }
     private func setupAndBeginCapturingVideoFrames() {
         videoCapture.setUpAVCapture { error in
@@ -227,25 +231,25 @@ class ViewController: UIViewController {
                 print("Failed to setup camera with error \(error)")
                 return
             }
-
+            
             self.videoCapture.delegate = self
-
+            
             self.videoCapture.startCapturing()
         }
     }
-
+    
     override func viewWillDisappear(_ animated: Bool) {
         videoCapture.stopCapturing {
             super.viewWillDisappear(animated)
         }
     }
-
+    
     override func viewWillTransition(to size: CGSize,
                                      with coordinator: UIViewControllerTransitionCoordinator) {
         // Reinitilize the camera to update its output stream with the new orientation.
         setupAndBeginCapturingVideoFrames()
     }
-
+    
     @IBAction func onCameraButtonTapped(_ sender: Any) {
         videoCapture.flipCamera { error in
             if let error = error {
@@ -253,13 +257,13 @@ class ViewController: UIViewController {
             }
         }
     }
-
+    
     @IBAction func onAlgorithmSegmentValueChanged(_ sender: UISegmentedControl) {
         guard let selectedAlgorithm = Algorithm(
             rawValue: sender.selectedSegmentIndex) else {
-                return
+            return
         }
-
+        
         algorithm = selectedAlgorithm
     }
 }
@@ -272,14 +276,14 @@ extension ViewController {
             return
         }
         guard let configurationViewController = uiNavigationController.viewControllers.first
-            as? ConfigurationViewController else {
-                    return
+                as? ConfigurationViewController else {
+            return
         }
-
+        
         configurationViewController.configuration = poseBuilderConfiguration
         configurationViewController.algorithm = algorithm
         configurationViewController.delegate = self
-
+        
         popOverPresentationManager = PopOverPresentationManager(presenting: self,
                                                                 presented: uiNavigationController)
         segue.destination.modalPresentationStyle = .custom
@@ -294,7 +298,7 @@ extension ViewController: ConfigurationViewControllerDelegate {
                                      didUpdateConfiguration configuration: PoseBuilderConfiguration) {
         poseBuilderConfiguration = configuration
     }
-
+    
     func configurationViewController(_ viewController: ConfigurationViewController,
                                      didUpdateAlgorithm algorithm: Algorithm) {
         self.algorithm = algorithm
@@ -319,36 +323,53 @@ extension ViewController: VideoCaptureDelegate {
         guard videoCurrentFrame == nil else {
             return
         }
-
+        
         self.videoCurrentFrame = image
         
         //UIImage to VisionImage
         let visionImage = VisionImage(image: uiImage)
-                
+        
         // ポーズ検出処理
         videoPoseDetector.process(visionImage) { detectedPoses, error in
-          guard error == nil else {
-              self.videoCurrentFrame = nil
-            // Error.
-              print("error in video")
-            return
-          }
+            guard error == nil else {
+                self.videoCurrentFrame = nil
+                // Error.
+                print("error in video")
+                return
+            }
+            guard let currentFrame = self.videoCurrentFrame else {
+                return
+            }
             guard let poses = detectedPoses, !poses.isEmpty else {
                 self.videoCurrentFrame = nil
-            // No pose detected.
+                // No pose detected.
                 print("no pose in video")
-            return
-          }
-
-          // Success. Get pose landmarks here.
-            for pose in poses {
-              let leftAnkleLandmark = pose.landmark(ofType: .leftAnkle)
-              if leftAnkleLandmark.inFrameLikelihood > 0.5 {
-                let position = leftAnkleLandmark.position
-                  print("detect from video:")
-                  print(position)
-              }
+                return
             }
+            
+            // Success. Get pose landmarks here.
+            var pose = poses[0]
+            // 3. PoseBuilderV2 を初期化して、内部の Pose オブジェクトを構築する
+            let builder = PoseBuilderV2(mlKitPose: pose, configuration: self.poseBuilderConfiguration)
+            
+            let studentPose = builder.pose
+            
+            let scaledPoseHelper = ScaledPoseHelper(teacherPose: self.teacherPose,studentPose: studentPose)
+            var (teacherScaledPose,scoredStudentPose) = scaledPoseHelper.getScaledPose()
+            
+            
+            //ここまでポーズ
+            teacherScaledPose.confidence = self.teacherPose.confidence
+            
+            
+            
+            
+            //print(poses)
+            //            movieScaledPreviewImageView.show(poses: [teacherScaledPose], on: currentFrame, isFrameDraw: false)
+            
+            //座標データ？
+            self.videoPreviewImageView.show(scaledPose: teacherScaledPose, studentPose: scoredStudentPose, on: currentFrame, isFrameDraw: true)
+            
             self.videoCurrentFrame = nil
         }
         
@@ -378,26 +399,26 @@ extension ViewController: PoseNetDelegate {
             let poses = algorithm == .single
             ? [poseBuilder.pose]
             : poseBuilder.poses
-//            print("student:",poses)
+            //            print("student:",poses)
             
             if(poses.count==0){
                 return
             }
             
             let studentPose = poses[0]
-
+            
             let scaledPoseHelper = ScaledPoseHelper(teacherPose: self.teacherPose,studentPose: studentPose)
             var (teacherScaledPose,scoredStudentPose) = scaledPoseHelper.getScaledPose()
-
-                
-                //ここまでポーズ
+            
+            
+            //ここまでポーズ
             teacherScaledPose.confidence = self.teacherPose.confidence
-
-                
-                
-             
-                //print(poses)
-//            movieScaledPreviewImageView.show(poses: [teacherScaledPose], on: currentFrame, isFrameDraw: false)
+            
+            
+            
+            
+            //print(poses)
+            //            movieScaledPreviewImageView.show(poses: [teacherScaledPose], on: currentFrame, isFrameDraw: false)
             
             //座標データ？
             videoPreviewImageView.show(scaledPose: teacherScaledPose, studentPose: scoredStudentPose, on: currentFrame, isFrameDraw: true)
@@ -426,12 +447,12 @@ extension ViewController: PoseNetDelegate {
             ? [poseBuilder.pose]
             : poseBuilder.poses
             
-//            print("teacher:",poses)
+            //            print("teacher:",poses)
             //ここに入れる
             // 先生のポーズ
             if let firstPose = poses.first {
                 self.teacherPose = firstPose
-
+                
                 // moviePreviewImageView.show の呼び出しを修正
                 moviePreviewImageView.show(scaledPose: firstPose, studentPose: firstPose, on: currentFrame, isFrameDraw: true)
             } else {
