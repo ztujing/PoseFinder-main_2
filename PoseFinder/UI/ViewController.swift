@@ -110,6 +110,7 @@ class ViewController: UIViewController {
         
         // セッションディレクトリ作成
         guard let dir = createSessionDirectory() else {
+            //FIXME: ユーザにアラートで知らせる
             fatalError("セッションディレクトリの作成に失敗しました")
         }
         sessionDirectory = dir
@@ -240,6 +241,19 @@ class ViewController: UIViewController {
             }
             
             self.videoCapture.delegate = self
+            
+            // 2. 録画出力をセッションに追加
+            if let captureSession = self.videoCapture.captureSession,
+               captureSession.canAddOutput(self.movieFileOutput) {
+                captureSession.addOutput(self.movieFileOutput)
+            }
+
+            // 3. 録画ファイルの出力先 URL を生成
+            if let sessionDir = self.sessionDirectory {
+                let videoURL = sessionDir.appendingPathComponent("video.mp4")
+                // 4. 録画開始
+                self.movieFileOutput.startRecording(to: videoURL, recordingDelegate: self)
+            }
             
             self.videoCapture.startCapturing()
         }
@@ -380,6 +394,19 @@ extension ViewController: VideoCaptureDelegate {
             self.videoCurrentFrame = nil
         }
         
+    }
+}
+extension ViewController: AVCaptureFileOutputRecordingDelegate {
+    func fileOutput(_ output: AVCaptureFileOutput,
+                    didFinishRecordingTo outputFileURL: URL,
+                    from connections: [AVCaptureConnection],
+                    error: Error?) {
+        if let error = error {
+            print("録画エラー: \(error)")
+        } else {
+            print("録画完了: \(outputFileURL.path)")
+        }
+        // ※JSON保存は録画停止後に行います（次ステップ）
     }
 }
 
