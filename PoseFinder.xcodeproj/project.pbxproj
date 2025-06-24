@@ -31,9 +31,18 @@
 		4AE8C3D123AD2D3B005F9953 /* PoseNetInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C3D023AD2D3B005F9953 /* PoseNetInput.swift */; };
 		4AE8C3D323AD2D8A005F9953 /* PoseNetOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C3D223AD2D8A005F9953 /* PoseNetOutput.swift */; };
 		4CAE58F0CB9F5537175E0C52 /* Pods_PoseFinder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */; };
+		6D0A1F812DC101700079EA28 /* FileManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D0A1F802DC101700079EA28 /* FileManager.swift */; };
 		6D12FCF22C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 6D12FCF12C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel */; };
 		6D1B1CC328CD64900013B0E1 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D1B1CC228CD64900013B0E1 /* PlayerView.swift */; };
 		6D2BDD8928968C0700AE55E9 /* traning.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6D820019287A463A00483910 /* traning.mp4 */; };
+		6D4324BE2E0ADAF7000FCDDE /* 001_概要設計.md in Resources */ = {isa = PBXBuildFile; fileRef = 6D4324B62E0ADAF7000FCDDE /* 001_概要設計.md */; };
+		6D4324BF2E0ADAF7000FCDDE /* 100_実装方針.md in Resources */ = {isa = PBXBuildFile; fileRef = 6D4324B72E0ADAF7000FCDDE /* 100_実装方針.md */; };
+		6D4324C02E0ADAF7000FCDDE /* 200_実装方針_動画保存_json保存まで.md in Resources */ = {isa = PBXBuildFile; fileRef = 6D4324B82E0ADAF7000FCDDE /* 200_実装方針_動画保存_json保存まで.md */; };
+		6D4324C12E0ADAF7000FCDDE /* PoseNetVisualization.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D4324B92E0ADAF7000FCDDE /* PoseNetVisualization.png */; };
+		6D4324C22E0ADAF7000FCDDE /* 202_タスク_json情報保存.md in Resources */ = {isa = PBXBuildFile; fileRef = 6D4324BA2E0ADAF7000FCDDE /* 202_タスク_json情報保存.md */; };
+		6D4324C32E0ADAF7000FCDDE /* 002_画面遷移図.md in Resources */ = {isa = PBXBuildFile; fileRef = 6D4324BB2E0ADAF7000FCDDE /* 002_画面遷移図.md */; };
+		6D4324C42E0ADAF7000FCDDE /* PoseNetPipeline.png in Resources */ = {isa = PBXBuildFile; fileRef = 6D4324BC2E0ADAF7000FCDDE /* PoseNetPipeline.png */; };
+		6D4324C52E0ADAF7000FCDDE /* 201_タスク_動画保存.md in Resources */ = {isa = PBXBuildFile; fileRef = 6D4324BD2E0ADAF7000FCDDE /* 201_タスク_動画保存.md */; };
 		6D447E0D2D92D3C500CE1449 /* PoseBuilderV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D447E0C2D92D3C400CE1449 /* PoseBuilderV2.swift */; };
 		6DD239422A5D93D90007D39A /* ScaledPoseHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD239412A5D93D90007D39A /* ScaledPoseHelper.swift */; };
 		6DD7A3162BF37F1A00079E4A /* bg_blue.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6DD7A3152BF37F1A00079E4A /* bg_blue.mp4 */; };
@@ -69,8 +78,17 @@
 		4AE8C3D023AD2D3B005F9953 /* PoseNetInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseNetInput.swift; sourceTree = "<group>"; };
 		4AE8C3D223AD2D8A005F9953 /* PoseNetOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseNetOutput.swift; sourceTree = "<group>"; };
 		57C02DF057C02B4000000001 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		6D0A1F802DC101700079EA28 /* FileManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileManager.swift; sourceTree = "<group>"; };
 		6D12FCF12C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PoseNetMobileNet100S8FP16.mlmodel; sourceTree = "<group>"; };
 		6D1B1CC228CD64900013B0E1 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+		6D4324B62E0ADAF7000FCDDE /* 001_概要設計.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "001_概要設計.md"; sourceTree = "<group>"; };
+		6D4324B72E0ADAF7000FCDDE /* 100_実装方針.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "100_実装方針.md"; sourceTree = "<group>"; };
+		6D4324B82E0ADAF7000FCDDE /* 200_実装方針_動画保存_json保存まで.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "200_実装方針_動画保存_json保存まで.md"; sourceTree = "<group>"; };
+		6D4324B92E0ADAF7000FCDDE /* PoseNetVisualization.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PoseNetVisualization.png; sourceTree = "<group>"; };
+		6D4324BA2E0ADAF7000FCDDE /* 202_タスク_json情報保存.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "202_タスク_json情報保存.md"; sourceTree = "<group>"; };
+		6D4324BB2E0ADAF7000FCDDE /* 002_画面遷移図.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "002_画面遷移図.md"; sourceTree = "<group>"; };
+		6D4324BC2E0ADAF7000FCDDE /* PoseNetPipeline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PoseNetPipeline.png; sourceTree = "<group>"; };
+		6D4324BD2E0ADAF7000FCDDE /* 201_タスク_動画保存.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = "201_タスク_動画保存.md"; sourceTree = "<group>"; };
 		6D447E0C2D92D3C400CE1449 /* PoseBuilderV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseBuilderV2.swift; sourceTree = "<group>"; };
 		6D820018287A45FD00483910 /* traning.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = traning.mp4; path = "../../iOS14-Resources-master/SwiftUIVideoPlayerCoreImage/SwiftUIVideoPlayerCoreImage/traning.mp4"; sourceTree = "<group>"; };
 		6D820019287A463A00483910 /* traning.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = traning.mp4; sourceTree = "<group>"; };
@@ -129,6 +147,7 @@
 		4A2D23A522BB70E400494C55 = {
 			isa = PBXGroup;
 			children = (
+				6D4324B52E0ADAF7000FCDDE /* Documentation */,
 				57C02DF057C02B4000000001 /* README.md */,
 				6D820019287A463A00483910 /* traning.mp4 */,
 				6DD7A3152BF37F1A00079E4A /* bg_blue.mp4 */,
@@ -167,6 +186,7 @@
 			children = (
 				4AA5C4B722BB9CC200277977 /* VideoCapture.swift */,
 				4ADE4C8B2346C07300FFD895 /* AVCaptureVideoOrientation+Extension.swift */,
+				6D0A1F802DC101700079EA28 /* FileManager.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -224,6 +244,21 @@
 				4AA5C4B922BBBC2A00277977 /* PoseNet.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		6D4324B52E0ADAF7000FCDDE /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				6D4324B62E0ADAF7000FCDDE /* 001_概要設計.md */,
+				6D4324B72E0ADAF7000FCDDE /* 100_実装方針.md */,
+				6D4324B82E0ADAF7000FCDDE /* 200_実装方針_動画保存_json保存まで.md */,
+				6D4324B92E0ADAF7000FCDDE /* PoseNetVisualization.png */,
+				6D4324BA2E0ADAF7000FCDDE /* 202_タスク_json情報保存.md */,
+				6D4324BB2E0ADAF7000FCDDE /* 002_画面遷移図.md */,
+				6D4324BC2E0ADAF7000FCDDE /* PoseNetPipeline.png */,
+				6D4324BD2E0ADAF7000FCDDE /* 201_タスク_動画保存.md */,
+			);
+			path = Documentation;
 			sourceTree = "<group>";
 		};
 		F9D56038BEBD5368191876E8 /* Frameworks */ = {
@@ -295,10 +330,18 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D4324BF2E0ADAF7000FCDDE /* 100_実装方針.md in Resources */,
+				6D4324C52E0ADAF7000FCDDE /* 201_タスク_動画保存.md in Resources */,
 				6D2BDD8928968C0700AE55E9 /* traning.mp4 in Resources */,
 				4A2D23BE22BB70E500494C55 /* LaunchScreen.storyboard in Resources */,
+				6D4324C32E0ADAF7000FCDDE /* 002_画面遷移図.md in Resources */,
+				6D4324C02E0ADAF7000FCDDE /* 200_実装方針_動画保存_json保存まで.md in Resources */,
+				6D4324C22E0ADAF7000FCDDE /* 202_タスク_json情報保存.md in Resources */,
 				6DD7A3162BF37F1A00079E4A /* bg_blue.mp4 in Resources */,
 				4A2D23BB22BB70E500494C55 /* Assets.xcassets in Resources */,
+				6D4324BE2E0ADAF7000FCDDE /* 001_概要設計.md in Resources */,
+				6D4324C12E0ADAF7000FCDDE /* PoseNetVisualization.png in Resources */,
+				6D4324C42E0ADAF7000FCDDE /* PoseNetPipeline.png in Resources */,
 				4A2D23B922BB70E400494C55 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -376,6 +419,7 @@
 				4A6C8A8223E84D1D0080886A /* GradientOverlayView.swift in Sources */,
 				4AA5C4B822BB9CC200277977 /* VideoCapture.swift in Sources */,
 				4AE8C3CF23AD2A74005F9953 /* CGImage+Extension.swift in Sources */,
+				6D0A1F812DC101700079EA28 /* FileManager.swift in Sources */,
 				4A0FC5BC23190AD6004886B9 /* CGPoint+Extension.swift in Sources */,
 				4A2D05CE23BF9A2C00D002ED /* ConfigurationViewController.swift in Sources */,
 				6D1B1CC328CD64900013B0E1 /* PlayerView.swift in Sources */,
