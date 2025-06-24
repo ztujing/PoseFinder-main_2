@@ -102,10 +102,17 @@ class ViewController: UIViewController {
     
     //teacherScaledPoseプロパティを追加
     var teacherPose: Pose = Pose()
+    private var sessionDirectory: URL?
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // セッションディレクトリ作成
+        guard let dir = createSessionDirectory() else {
+            fatalError("セッションディレクトリの作成に失敗しました")
+        }
+        sessionDirectory = dir
         
         // For convenience, the idle timer is disabled to prevent the screen from locking.
         UIApplication.shared.isIdleTimerDisabled = true
