@@ -76,6 +76,8 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var ScoreLabel: UILabel!
     private let videoCapture = VideoCapture()
+    // 追加：録画出力用のプロパティ
+    private let movieFileOutput = AVCaptureMovieFileOutput()
     
     //    private var videoPoseNet: PoseNet!
     //    private var moviePoseNet: PoseNet!
@@ -196,7 +198,7 @@ class ViewController: UIViewController {
                     // No pose detected.
                     return
                 }
-                guard let currentFrame = movieCurrentFrame else {
+                guard let currentFrame = self.movieCurrentFrame else {
                     return
                 }
                 var pose = poses[0]
@@ -243,8 +245,8 @@ class ViewController: UIViewController {
             self.videoCapture.delegate = self
             
             // 2. 録画出力をセッションに追加
-            if let captureSession = self.videoCapture.captureSession,
-               captureSession.canAddOutput(self.movieFileOutput) {
+            let captureSession = self.videoCapture.captureSession
+            if captureSession.canAddOutput(self.movieFileOutput) {
                 captureSession.addOutput(self.movieFileOutput)
             }
 
@@ -287,6 +289,30 @@ class ViewController: UIViewController {
         
         algorithm = selectedAlgorithm
     }
+    // ── ここからテスト用コードを追加 ──
+        // MARK: — Test Recording Helpers —
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            // テスト用：1秒後に録画開始、3秒後に停止
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self.startTestRecording()
+            }
+        }
+
+        private func startTestRecording() {
+            guard let sessionDir = sessionDirectory else {
+                print("⚠️ sessionDirectory が nil です")
+                return
+            }
+            let videoURL = sessionDir.appendingPathComponent("video.mp4")
+            print("▶️ テスト録画開始: \(videoURL.path)")
+            self.movieFileOutput.startRecording(to: videoURL, recordingDelegate: self)
+
+            // 3秒録画したら停止
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                self.movieFileOutput.stopRecording()
+            }
+        }
 }
 
 // MARK: - Navigation
@@ -395,19 +421,35 @@ extension ViewController: VideoCaptureDelegate {
         }
         
     }
+    
+    
 }
+
 extension ViewController: AVCaptureFileOutputRecordingDelegate {
-    func fileOutput(_ output: AVCaptureFileOutput,
-                    didFinishRecordingTo outputFileURL: URL,
-                    from connections: [AVCaptureConnection],
-                    error: Error?) {
-        if let error = error {
-            print("録画エラー: \(error)")
-        } else {
-            print("録画完了: \(outputFileURL.path)")
-        }
-        // ※JSON保存は録画停止後に行います（次ステップ）
+  func fileOutput(_ output: AVCaptureFileOutput,
+                  didFinishRecordingTo outputFileURL: URL,
+                  from connections: [AVCaptureConnection],
+                  error: Error?) {
+    if let error = error {
+      print("⚠️ 録画エラー: \(error)")
+      return
     }
+
+    let path = outputFileURL.path
+    let exists = FileManager.default.fileExists(atPath: path)
+    print("✔️ 録画完了: \(path) (exists: \(exists))")
+
+    // セッションフォルダ内の一覧も出力
+    if let dir = sessionDirectory {
+      do {
+        let items = try FileManager.default.contentsOfDirectory(atPath: dir.path)
+        print("▶️ フォルダ内: \(items)")
+      } catch {
+        print("⚠️ フォルダ読み込み失敗: \(error)")
+      }
+    }
+
+  }
 }
 
 // MARK: - PoseNetDelegate
