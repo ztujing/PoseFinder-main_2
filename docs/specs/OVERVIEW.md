@@ -1,6 +1,6 @@
 # プロジェクト概要（OVERVIEW）
 
-本ドキュメントは iOS アプリ「PoseFinder」の全体像を俯瞰し、役割・依存・処理フローを整理します。対象は Swift 製、教師（動画）×生徒（カメラ）の姿勢推定・可視化アプリです。推論は ML Kit Pose Detection を主経路とし、Core ML PoseNet 経路は併存（UI では未使用）。
+本ドキュメントは iOS アプリ「PoseFinder」の全体像を俯瞰し、役割・依存・処理フローを整理します。対象は Swift 製、教師（動画）×生徒（カメラ）の姿勢推定・可視化アプリです。推論は Google ML Kit Pose Detection を用いる。
 
 ## 目次
 - 背景と目的
@@ -42,6 +42,7 @@
 - 描画: `PoseImageView` が教師（青）/生徒（赤）を重ね描画（点色はスコアに応じ赤→緑連続）
 
 ## データフロー（パイプライン）
+
 ```mermaid
 flowchart LR
   subgraph Input
@@ -49,8 +50,8 @@ flowchart LR
     Vid[Video\nAVPlayer+AVVideoComposition] --> CG2[CGImage]
   end
 
-  CG1 --> MLK1[ML Kit\nPoseDetector(stream)] --> StuPose[Pose (student)]
-  CG2 --> MLK2[ML Kit\nPoseDetector(stream)] --> TeaPose[Pose (teacher)]
+  CG1 --> MLK1[ML Kit\nPoseDetector:stream] --> StuPose[Pose :student]
+  CG2 --> MLK2[ML Kit\nPoseDetector:stream] --> TeaPose[Pose :teacher]
 
   StuPose --> SPH[ScaledPoseHelper]
   TeaPose --> SPH
@@ -72,13 +73,12 @@ flowchart LR
   - 教師ポーズを基準にスケーリング（教師→生徒）
   - 各関節の距離に基づき `Joint.score` を算出、平均化して `Pose.score`
 
-## 性能・電力・権限
+## 性能・権限
 - 性能: 遅延フレーム破棄により実時間描画を優先。FPS/レイテンシ計測、CPU/GPU/ANE 利用状況の収集は未実装。
-- 電力: サンプリング制御や熱状態監視は未実装。
 - 権限: `NSCameraUsageDescription` は `PoseFinder/App/Info.plist` に定義済み。
 
 ## ログ/計測
-- 現状: `print` ログのみ。OSLog、FPS/レイテンシ、温度/サーマル状態監視は未導入。
+- 現状: `print` ログのみ。OSLog、FPS/レイテンシ監視は未導入。
 
 ## 参考資料
 - `README.md`: パイプライン説明と抜粋コード
