@@ -12,7 +12,11 @@ import UIKit
 import VideoToolbox
 
 protocol VideoCaptureDelegate: AnyObject {
-    func videoCapture(_ videoCapture: VideoCapture, didCaptureFrame image: CGImage?)
+    func videoCapture(_ videoCapture: VideoCapture, didCaptureFrame image: CGImage?, timestamp: CMTime)
+}
+
+protocol VideoCaptureSampleBufferDelegate: AnyObject {
+    func videoCapture(_ videoCapture: VideoCapture, didOutput sampleBuffer: CMSampleBuffer)
 }
 
 /// - Tag: VideoCapture
@@ -26,6 +30,9 @@ class VideoCapture: NSObject {
 
     /// The delegate to receive the captured frames.
     weak var delegate: VideoCaptureDelegate?
+
+    /// The delegate to tap raw CMSampleBuffer frames.
+    weak var sampleBufferDelegate: VideoCaptureSampleBufferDelegate?
 
     /// A capture session used to coordinate the flow of data from input devices to capture outputs.
     let captureSession = AVCaptureSession()
@@ -142,7 +149,7 @@ class VideoCapture: NSObject {
 
         // Set the pixel type.
         let settings: [String: Any] = [
-            String(kCVPixelBufferPixelFormatTypeKey): kCVPixelFormatType_420YpCbCr8BiPlanarFullRange
+            String(kCVPixelBufferPixelFormatTypeKey): kCVPixelFormatType_32BGRA
         ]
 
         videoOutput.videoSettings = settings
@@ -226,6 +233,12 @@ extension VideoCapture: AVCaptureVideoDataOutputSampleBufferDelegate {
     public func captureOutput(_ output: AVCaptureOutput,
                               didOutput sampleBuffer: CMSampleBuffer,
                               from connection: AVCaptureConnection) {
+        let timestamp = CMSampleBufferGetPresentationTimeStamp(sampleBuffer)
+
+        if let sampleBufferDelegate = sampleBufferDelegate {
+            sampleBufferDelegate.videoCapture(self, didOutput: sampleBuffer)
+        }
+
         guard let delegate = delegate else { return }
 
         if let pixelBuffer = sampleBuffer.imageBuffer {
@@ -247,7 +260,7 @@ extension VideoCapture: AVCaptureVideoDataOutputSampleBufferDelegate {
             CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
 
             DispatchQueue.main.sync {
-                delegate.videoCapture(self, didCaptureFrame: image)
+                delegate.videoCapture(self, didCaptureFrame: image, timestamp: timestamp)
             }
         }
     }

@@ -95,10 +95,13 @@ class ViewController: UIViewController {
     private var poseBuilderConfiguration = PoseBuilderConfiguration()
     
     private var popOverPresentationManager: PopOverPresentationManager?
-    
+
     private var playerLayer:AVPlayerLayer!
     private var player:AVPlayer!
     @IBOutlet weak var playerView: PlayerView!
+
+    private let recordingSessionManager = RecordingSessionManager()
+    private var isRecordingSessionActive = false
     
     //teacherScaledPoseプロパティを追加
     var teacherPose: Pose = Pose()
@@ -126,6 +129,10 @@ class ViewController: UIViewController {
         setupAndBeginCapturingVideoFrames()
         setupAndBeginCapturingMovieFrames()
     }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
     
     //追加　Viewのサイズを揃える
     override func viewDidLayoutSubviews() {
@@ -146,6 +153,7 @@ class ViewController: UIViewController {
     }
     
     private func setupAndBeginCapturingMovieFrames() {
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
         let asset = AVAsset(url: Bundle.main.url(forResource: "traning", withExtension: "mp4")!)
         let composition = AVVideoComposition(asset: asset, applyingCIFiltersWithHandler: { [self] request in
             //          print("test")
@@ -209,6 +217,11 @@ class ViewController: UIViewController {
         )
         let playerItem = AVPlayerItem(asset: asset)
         playerItem.videoComposition = composition
+
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handlePlaybackDidFinish(_:)),
+                                               name: .AVPlayerItemDidPlayToEndTime,
+                                               object: playerItem)
         
         self.player = AVPlayer(playerItem: playerItem)
         
@@ -219,11 +232,38 @@ class ViewController: UIViewController {
         
         self.playerView.playerLayer = self.playerLayer
         self.playerView.layer.insertSublayer(playerLayer, at: 0)
-        
+
         self.player.play()
-        
-        
-        
+
+        startRecordingSession()
+
+
+
+    }
+
+    private func startRecordingSession() {
+        guard !isRecordingSessionActive else { return }
+        do {
+            try recordingSessionManager.start(cameraPosition: videoCapture.cameraPostion,
+                                              preset: videoCapture.captureSession.sessionPreset)
+            isRecordingSessionActive = true
+        } catch {
+            print("Recording session start failed: \(error)")
+        }
+    }
+
+    private func stopRecordingSession() {
+        guard isRecordingSessionActive else { return }
+        isRecordingSessionActive = false
+        recordingSessionManager.stop { result in
+            if case let .failure(error) = result {
+                print("Recording session stop failed: \(error)")
+            }
+        }
+    }
+
+    @objc private func handlePlaybackDidFinish(_ notification: Notification) {
+        stopRecordingSession()
     }
     private func setupAndBeginCapturingVideoFrames() {
         videoCapture.setUpAVCapture { error in
@@ -231,14 +271,17 @@ class ViewController: UIViewController {
                 print("Failed to setup camera with error \(error)")
                 return
             }
-            
+
             self.videoCapture.delegate = self
-            
+            self.videoCapture.sampleBufferDelegate = self
+
             self.videoCapture.startCapturing()
         }
     }
-    
+
     override func viewWillDisappear(_ animated: Bool) {
+        stopRecordingSession()
+        NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
         videoCapture.stopCapturing {
             super.viewWillDisappear(animated)
         }
@@ -308,17 +351,20 @@ extension ViewController: ConfigurationViewControllerDelegate {
 // MARK: - VideoCaptureDelegate
 
 extension ViewController: VideoCaptureDelegate {
-    func videoCapture(_ videoCapture: VideoCapture, didCaptureFrame capturedImage: CGImage?) {
-        
+    func videoCapture(_ videoCapture: VideoCapture, didCaptureFrame capturedImage: CGImage?, timestamp: CMTime) {
+
         guard let image = capturedImage else {
             fatalError("Captured image is null")
         }
-        
+
+        let frameSize = CGSize(width: image.width, height: image.height)
+        let frameTimestamp = timestamp
+
         //CGImage to UIImage
         let uiImage = UIImage(cgImage: image)
-        
+
         self.videoPreviewImageView.image = uiImage
-        
+
         
         guard videoCurrentFrame == nil else {
             return
@@ -328,7 +374,7 @@ extension ViewController: VideoCaptureDelegate {
         
         //UIImage to VisionImage
         let visionImage = VisionImage(image: uiImage)
-        
+
         // ポーズ検出処理
         videoPoseDetector.process(visionImage) { detectedPoses, error in
             guard error == nil else {
@@ -348,16 +394,22 @@ extension ViewController: VideoCaptureDelegate {
             }
             
             // Success. Get pose landmarks here.
-            var pose = poses[0]
+            let sourcePose = poses[0]
             // 3. PoseBuilderV2 を初期化して、内部の Pose オブジェクトを構築する
-            let builder = PoseBuilderV2(mlKitPose: pose, configuration: self.poseBuilderConfiguration)
+            let builder = PoseBuilderV2(mlKitPose: sourcePose, configuration: self.poseBuilderConfiguration)
             
-            let studentPose = builder.pose
+            var studentPose = builder.pose
+
+            if self.isRecordingSessionActive {
+                self.recordingSessionManager.appendPose(studentPose,
+                                                        timestamp: frameTimestamp,
+                                                        imageSize: frameSize)
+            }
             
             let scaledPoseHelper = ScaledPoseHelper(teacherPose: self.teacherPose,studentPose: studentPose)
             var (teacherScaledPose,scoredStudentPose) = scaledPoseHelper.getScaledPose()
-            
-            
+
+
             //ここまでポーズ
             teacherScaledPose.confidence = self.teacherPose.confidence
             
@@ -373,6 +425,13 @@ extension ViewController: VideoCaptureDelegate {
             self.videoCurrentFrame = nil
         }
         
+    }
+}
+
+extension ViewController: VideoCaptureSampleBufferDelegate {
+    func videoCapture(_ videoCapture: VideoCapture, didOutput sampleBuffer: CMSampleBuffer) {
+        guard isRecordingSessionActive else { return }
+        recordingSessionManager.appendVideo(sampleBuffer: sampleBuffer)
     }
 }
 
