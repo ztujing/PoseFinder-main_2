@@ -256,7 +256,10 @@ class ViewController: UIViewController {
         guard isRecordingSessionActive else { return }
         isRecordingSessionActive = false
         recordingSessionManager.stop { result in
-            if case let .failure(error) = result {
+            switch result {
+            case .success(let directoryURL):
+                print("Saved to: \(directoryURL.path)")
+            case .failure(let error):
                 print("Recording session stop failed: \(error)")
             }
         }

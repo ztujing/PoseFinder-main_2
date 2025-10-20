@@ -100,13 +100,22 @@ final class RecordingSessionManager {
                 }
             }
             handle = try FileHandle(forWritingTo: fileURL)
-            try handle.seekToEnd()
+            if #available(iOS 13.4, *) {
+                try handle.seekToEnd()
+            } else {
+                handle.seekToEndOfFile()
+            }
         }
 
         func append(_ data: Data) {
             queue.async { [weak self] in
                 do {
-                    try self?.handle.write(contentsOf: data)
+                    guard let handle = self?.handle else { return }
+                    if #available(iOS 13.4, *) {
+                        try handle.write(contentsOf: data)
+                    } else {
+                        handle.write(data)
+                    }
                 } catch {
                     print("PoseNDJSONWriter append failed: \(error)")
                 }
@@ -116,7 +125,12 @@ final class RecordingSessionManager {
         func close() {
             queue.sync { [weak self] in
                 do {
-                    try self?.handle.close()
+                    guard let handle = self?.handle else { return }
+                    if #available(iOS 13.4, *) {
+                        try handle.close()
+                    } else {
+                        handle.closeFile()
+                    }
                 } catch {
                     print("PoseNDJSONWriter close failed: \(error)")
                 }

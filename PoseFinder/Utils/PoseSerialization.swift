@@ -5,7 +5,7 @@ import Foundation
 /// JSON書き出し用のユーティリティ。
 /// Pose構造体をセッション録画で利用するNDJSON形式へシリアライズする。
 enum PoseSerialization {
-    private struct JointPayload: Codable {
+    struct JointPayload: Codable {
         let x: Double
         let y: Double
         let c: Double
