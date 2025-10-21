@@ -4,7 +4,7 @@
 - Date: 2025-09-09
 - Pair Impl: `IMPL-0001-video-and-pose-json.md`
 - Related Specs: `docs/specs/001_概要設計.md`, `docs/specs/002_画面遷移図.md`
-- Related Notes: `docs/specs/他AI提案/200_実装方針_動画保存_json保存まで.md`
+- Related Notes: （なし）
 
 ## Context
 ユーザーが筋トレ中のフォームを客観的に記録・再生できるよう、撮影動画と姿勢（Pose）を同期して保存・再生する機能が必要。現状のアプリは“姿勢検出の検証実装”段階で、保存は未対応。
@@ -122,4 +122,3 @@
 
 ## Artifacts（想定）
 - 出力例: `…/Documents/Sessions/20250909-223000/{video.mp4, pose.ndjson, session.json}`
-
