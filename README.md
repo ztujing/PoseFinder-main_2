@@ -1,203 +1,609 @@
-# Detecting Human Body Poses in an Image
+// !$*UTF8*$!
+{
+    archiveVersion = 1;
+    classes = {
+    };
+    objectVersion = 54;
+    objects = {
 
-Locate people and the stance of their bodies by analyzing an image with a PoseNet model.
+/* Begin PBXBuildFile section */
+        0D4BB83F249769C800076D64 /* PoseNetMobileNet075S16FP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 0D4BB83E249769C800076D64 /* PoseNetMobileNet075S16FP16.mlmodel */; };
+        0DCEF2C7241666CA00ECEC99 /* PoseBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF2C6241666CA00ECEC99 /* PoseBuilder.swift */; };
+        0DCEF2C92416701D00ECEC99 /* PoseBuilder+Single.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF2C82416701D00ECEC99 /* PoseBuilder+Single.swift */; };
+        0DCEF2CB2416709B00ECEC99 /* PoseBuilder+Multiple.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF2CA2416709B00ECEC99 /* PoseBuilder+Multiple.swift */; };
+        0DCEF2CE241676C000ECEC99 /* PoseBuilderConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF2CD241676C000ECEC99 /* PoseBuilderConfiguration.swift */; };
+        4A0FC5BC23190AD6004886B9 /* CGPoint+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A0FC5BB23190AD6004886B9 /* CGPoint+Extension.swift */; };
+        4A2D05CE23BF9A2C00D002ED /* ConfigurationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A2D05CD23BF9A2C00D002ED /* ConfigurationViewController.swift */; };
+        4A2D05D023BF9BBF00D002ED /* PopOverModalViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A2D05CF23BF9BBF00D002ED /* PopOverModalViewController.swift */; };
+        4A2D23B222BB70E400494C55 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A2D23B122BB70E400494C55 /* AppDelegate.swift */; };
+        4A2D23B622BB70E400494C55 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A2D23B522BB70E400494C55 /* ViewController.swift */; };
+        4A2D23B922BB70E400494C55 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A2D23B722BB70E400494C55 /* Main.storyboard */; };
+        4A2D23BB22BB70E500494C55 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4A2D23BA22BB70E500494C55 /* Assets.xcassets */; };
+        4A2D23BE22BB70E500494C55 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4A2D23BC22BB70E500494C55 /* LaunchScreen.storyboard */; };
+        4A6C8A8223E84D1D0080886A /* GradientOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6C8A8123E84D1D0080886A /* GradientOverlayView.swift */; };
+        4A97FA952350ABDE00255C7F /* Pose.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A97FA942350ABDE00255C7F /* Pose.swift */; };
+        4AA5C4B822BB9CC200277977 /* VideoCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AA5C4B722BB9CC200277977 /* VideoCapture.swift */; };
+        4AA5C4BA22BBBC2A00277977 /* PoseNet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AA5C4B922BBBC2A00277977 /* PoseNet.swift */; };
+        4ADD52F822BBCF580008FAAC /* Joint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ADD52F722BBCF580008FAAC /* Joint.swift */; };
+        4ADE4C8C2346C07300FFD895 /* AVCaptureVideoOrientation+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ADE4C8B2346C07300FFD895 /* AVCaptureVideoOrientation+Extension.swift */; };
+        4AE8C3CB23ACDF1C005F9953 /* PoseImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C3CA23ACDF1C005F9953 /* PoseImageView.swift */; };
+        4AE8C3CF23AD2A74005F9953 /* CGImage+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C3CE23AD2A74005F9953 /* CGImage+Extension.swift */; };
+        4AE8C3D123AD2D3B005F9953 /* PoseNetInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C3D023AD2D3B005F9953 /* PoseNetInput.swift */; };
+        4AE8C3D323AD2D8A005F9953 /* PoseNetOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C3D223AD2D8A005F9953 /* PoseNetOutput.swift */; };
+        4CAE58F0CB9F5537175E0C52 /* Pods_PoseFinder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */; };
+        6D12FCF22C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 6D12FCF12C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel */; };
+        6D1B1CC328CD64900013B0E1 /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D1B1CC228CD64900013B0E1 /* PlayerView.swift */; };
+        6D2BDD8928968C0700AE55E9 /* traning.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6D820019287A463A00483910 /* traning.mp4 */; };
+        6D447E0D2D92D3C500CE1449 /* PoseBuilderV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D447E0C2D92D3C400CE1449 /* PoseBuilderV2.swift */; };
+        6DD239422A5D93D90007D39A /* ScaledPoseHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DD239412A5D93D90007D39A /* ScaledPoseHelper.swift */; };
+        6DD7A3162BF37F1A00079E4A /* bg_blue.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6DD7A3152BF37F1A00079E4A /* bg_blue.mp4 */; };
+        6DF0B1012E00AA1100AA0001 /* PoseSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0B1002E00AA1100AA0001 /* PoseSerialization.swift */; };
+        6DF0B1032E00AA1100AA0001 /* RecordingSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0B1022E00AA1100AA0001 /* RecordingSessionManager.swift */; };
+/* End PBXBuildFile section */
 
-## Overview
+/* Begin PBXFileReference section */
+        0563E980FDE557646F54ED8A /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
+        0D4BB83E249769C800076D64 /* PoseNetMobileNet075S16FP16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PoseNetMobileNet075S16FP16.mlmodel; sourceTree = "<group>"; };
+        0DCEF2C6241666CA00ECEC99 /* PoseBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseBuilder.swift; sourceTree = "<group>"; };
+        0DCEF2C82416701D00ECEC99 /* PoseBuilder+Single.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PoseBuilder+Single.swift"; sourceTree = "<group>"; };
+        0DCEF2CA2416709B00ECEC99 /* PoseBuilder+Multiple.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PoseBuilder+Multiple.swift"; sourceTree = "<group>"; };
+        0DCEF2CD241676C000ECEC99 /* PoseBuilderConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseBuilderConfiguration.swift; sourceTree = "<group>"; };
+        420B7A9F4BA833CE510130DA /* ACKNOWLEDGMENTS.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = ACKNOWLEDGMENTS.txt; sourceTree = "<group>"; };
+        45926716BFFD2EB28BE81815 /* Pods-PoseFinder.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PoseFinder.release.xcconfig"; path = "Target Support Files/Pods-PoseFinder/Pods-PoseFinder.release.xcconfig"; sourceTree = "<group>"; };
+        4A0FC5BB23190AD6004886B9 /* CGPoint+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Extension.swift"; sourceTree = "<group>"; };
+        4A2D05CD23BF9A2C00D002ED /* ConfigurationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationViewController.swift; sourceTree = "<group>"; };
+        4A2D05CF23BF9BBF00D002ED /* PopOverModalViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopOverModalViewController.swift; sourceTree = "<group>"; };
+        4A2D23AE22BB70E400494C55 /* PoseFinder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PoseFinder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+        4A2D23B122BB70E400494C55 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+        4A2D23B522BB70E400494C55 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+        4A2D23B822BB70E400494C55 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+        4A2D23BA22BB70E500494C55 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+        4A2D23BD22BB70E500494C55 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+        4A2D23BF22BB70E500494C55 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+        4A6C8A8123E84D1D0080886A /* GradientOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientOverlayView.swift; sourceTree = "<group>"; };
+        4A97FA942350ABDE00255C7F /* Pose.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pose.swift; sourceTree = "<group>"; };
+        4AA5C4B722BB9CC200277977 /* VideoCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCapture.swift; sourceTree = "<group>"; };
+        4AA5C4B922BBBC2A00277977 /* PoseNet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseNet.swift; sourceTree = "<group>"; };
+        4ADD52F722BBCF580008FAAC /* Joint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Joint.swift; sourceTree = "<group>"; };
+        4ADE4C8B2346C07300FFD895 /* AVCaptureVideoOrientation+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AVCaptureVideoOrientation+Extension.swift"; sourceTree = "<group>"; };
+        4AE8C3CA23ACDF1C005F9953 /* PoseImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseImageView.swift; sourceTree = "<group>"; };
+        4AE8C3CE23AD2A74005F9953 /* CGImage+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGImage+Extension.swift"; sourceTree = "<group>"; };
+        4AE8C3D023AD2D3B005F9953 /* PoseNetInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseNetInput.swift; sourceTree = "<group>"; };
+        4AE8C3D223AD2D8A005F9953 /* PoseNetOutput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseNetOutput.swift; sourceTree = "<group>"; };
+        57C02DF057C02B4000000001 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+        6D12FCF12C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = PoseNetMobileNet100S8FP16.mlmodel; sourceTree = "<group>"; };
+        6D1B1CC228CD64900013B0E1 /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
+        6D447E0C2D92D3C400CE1449 /* PoseBuilderV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseBuilderV2.swift; sourceTree = "<group>"; };
+        6D820018287A45FD00483910 /* traning.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = traning.mp4; path = "../../iOS14-Resources-master/SwiftUIVideoPlayerCoreImage/SwiftUIVideoPlayerCoreImage/traning.mp4"; sourceTree = "<group>"; };
+        6D820019287A463A00483910 /* traning.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = traning.mp4; sourceTree = "<group>"; };
+        6DD239412A5D93D90007D39A /* ScaledPoseHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledPoseHelper.swift; sourceTree = "<group>"; };
+        6DD7A3152BF37F1A00079E4A /* bg_blue.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = bg_blue.mp4; sourceTree = "<group>"; };
+        6DF0B1002E00AA1100AA0001 /* PoseSerialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseSerialization.swift; sourceTree = "<group>"; };
+        6DF0B1022E00AA1100AA0001 /* RecordingSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingSessionManager.swift; sourceTree = "<group>"; };
+        BEE6CF152B804A05BF905D20 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
+        E141FCF9BCE9A5F93433101C /* Pods-PoseFinder.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PoseFinder.debug.xcconfig"; path = "Target Support Files/Pods-PoseFinder/Pods-PoseFinder.debug.xcconfig"; sourceTree = "<group>"; };
+        F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PoseFinder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
 
-This sample project provides an illustrative example of using a third-party [Core ML](https://developer.apple.com/documentation/coreml) model, PoseNet, to detect human body poses from frames captured using a camera. PoseNet models detect 17 different body parts or joints: eyes, ears, nose, shoulders, hips, elbows, knees, wrists, and ankles. Collectively these joints form a pose.
+/* Begin PBXFrameworksBuildPhase section */
+        4A2D23AB22BB70E400494C55 /* Frameworks */ = {
+            isa = PBXFrameworksBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                4CAE58F0CB9F5537175E0C52 /* Pods_PoseFinder.framework in Frameworks */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+/* End PBXFrameworksBuildPhase section */
 
-![Flow diagram illustrating the sequence of activities for estimating a pose. The flow begins on the left with an iPhone’s camera, proceeding to a PoseNet model, followed by a generic human figure with the 17 labeled joints, and ends with the same human figure but with the joints connected in a wireframe.](Documentation/PoseNetPipeline.png)
+/* Begin PBXGroup section */
+        0D8A71B927BDB43FD8F91908 /* LICENSE */ = {
+            isa = PBXGroup;
+            children = (
+                6D820018287A45FD00483910 /* traning.mp4 */,
+                0563E980FDE557646F54ED8A /* LICENSE.txt */,
+                420B7A9F4BA833CE510130DA /* ACKNOWLEDGMENTS.txt */,
+            );
+            path = LICENSE;
+            sourceTree = "<group>";
+        };
+        0DCEF2CC241675C200ECEC99 /* Pose */ = {
+            isa = PBXGroup;
+            children = (
+                0DCEF2CD241676C000ECEC99 /* PoseBuilderConfiguration.swift */,
+                0DCEF2C6241666CA00ECEC99 /* PoseBuilder.swift */,
+                0DCEF2C82416701D00ECEC99 /* PoseBuilder+Single.swift */,
+                0DCEF2CA2416709B00ECEC99 /* PoseBuilder+Multiple.swift */,
+                4A97FA942350ABDE00255C7F /* Pose.swift */,
+                4ADD52F722BBCF580008FAAC /* Joint.swift */,
+                6DD239412A5D93D90007D39A /* ScaledPoseHelper.swift */,
+                6D447E0C2D92D3C400CE1449 /* PoseBuilderV2.swift */,
+            );
+            path = Pose;
+            sourceTree = "<group>";
+        };
+        1E2F76EA3781C8213469E3A0 /* Configuration */ = {
+            isa = PBXGroup;
+            children = (
+                BEE6CF152B804A05BF905D20 /* SampleCode.xcconfig */,
+            );
+            name = Configuration;
+            sourceTree = "<group>";
+        };
+        4A2D23A522BB70E400494C55 = {
+            isa = PBXGroup;
+            children = (
+                57C02DF057C02B4000000001 /* README.md */,
+                6D820019287A463A00483910 /* traning.mp4 */,
+                6DD7A3152BF37F1A00079E4A /* bg_blue.mp4 */,
+                4A2D23B022BB70E400494C55 /* PoseFinder */,
+                4A2D23AF22BB70E400494C55 /* Products */,
+                1E2F76EA3781C8213469E3A0 /* Configuration */,
+                0D8A71B927BDB43FD8F91908 /* LICENSE */,
+                5387E8F6B9E446E933610DC7 /* Pods */,
+                F9D56038BEBD5368191876E8 /* Frameworks */,
+            );
+            sourceTree = "<group>";
+        };
+        4A2D23AF22BB70E400494C55 /* Products */ = {
+            isa = PBXGroup;
+            children = (
+                4A2D23AE22BB70E400494C55 /* PoseFinder.app */,
+            );
+            name = Products;
+            sourceTree = "<group>";
+        };
+        4A2D23B022BB70E400494C55 /* PoseFinder */ = {
+            isa = PBXGroup;
+            children = (
+                0DCEF2CC241675C200ECEC99 /* Pose */,
+                6594E51B23454C4100D3C44D /* Model */,
+                4AFBF15322CC9A1900A4B11A /* Extensions+Types */,
+                4AFBF15222CC9A1300A4B11A /* Utils */,
+                6594E51A23454A2300D3C44D /* UI */,
+                6594E5192345489C00D3C44D /* App */,
+            );
+            path = PoseFinder;
+            sourceTree = "<group>";
+        };
+        4AFBF15222CC9A1300A4B11A /* Utils */ = {
+            isa = PBXGroup;
+            children = (
+                6DF0B1022E00AA1100AA0001 /* RecordingSessionManager.swift */,
+                6DF0B1002E00AA1100AA0001 /* PoseSerialization.swift */,
+                4AA5C4B722BB9CC200277977 /* VideoCapture.swift */,
+                4ADE4C8B2346C07300FFD895 /* AVCaptureVideoOrientation+Extension.swift */,
+            );
+            path = Utils;
+            sourceTree = "<group>";
+        };
+        4AFBF15322CC9A1900A4B11A /* Extensions+Types */ = {
+            isa = PBXGroup;
+            children = (
+                4A0FC5BB23190AD6004886B9 /* CGPoint+Extension.swift */,
+                4AE8C3CE23AD2A74005F9953 /* CGImage+Extension.swift */,
+            );
+            path = "Extensions+Types";
+            sourceTree = "<group>";
+        };
+        5387E8F6B9E446E933610DC7 /* Pods */ = {
+            isa = PBXGroup;
+            children = (
+                E141FCF9BCE9A5F93433101C /* Pods-PoseFinder.debug.xcconfig */,
+                45926716BFFD2EB28BE81815 /* Pods-PoseFinder.release.xcconfig */,
+            );
+            path = Pods;
+            sourceTree = "<group>";
+        };
+        6594E5192345489C00D3C44D /* App */ = {
+            isa = PBXGroup;
+            children = (
+                4A2D23B122BB70E400494C55 /* AppDelegate.swift */,
+                4A2D23BF22BB70E500494C55 /* Info.plist */,
+                4A2D23B722BB70E400494C55 /* Main.storyboard */,
+                4A2D23BC22BB70E500494C55 /* LaunchScreen.storyboard */,
+                4A2D23BA22BB70E500494C55 /* Assets.xcassets */,
+            );
+            path = App;
+            sourceTree = "<group>";
+        };
+        6594E51A23454A2300D3C44D /* UI */ = {
+            isa = PBXGroup;
+            children = (
+                4A2D23B522BB70E400494C55 /* ViewController.swift */,
+                4AE8C3CA23ACDF1C005F9953 /* PoseImageView.swift */,
+                4A6C8A8123E84D1D0080886A /* GradientOverlayView.swift */,
+                4A2D05CD23BF9A2C00D002ED /* ConfigurationViewController.swift */,
+                4A2D05CF23BF9BBF00D002ED /* PopOverModalViewController.swift */,
+                6D1B1CC228CD64900013B0E1 /* PlayerView.swift */,
+            );
+            path = UI;
+            sourceTree = "<group>";
+        };
+        6594E51B23454C4100D3C44D /* Model */ = {
+            isa = PBXGroup;
+            children = (
+                6D12FCF12C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel */,
+                0D4BB83E249769C800076D64 /* PoseNetMobileNet075S16FP16.mlmodel */,
+                4AE8C3D023AD2D3B005F9953 /* PoseNetInput.swift */,
+                4AE8C3D223AD2D8A005F9953 /* PoseNetOutput.swift */,
+                4AA5C4B922BBBC2A00277977 /* PoseNet.swift */,
+            );
+            path = Model;
+            sourceTree = "<group>";
+        };
+        F9D56038BEBD5368191876E8 /* Frameworks */ = {
+            isa = PBXGroup;
+            children = (
+                F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */,
+            );
+            name = Frameworks;
+            sourceTree = "<group>";
+        };
+/* End PBXGroup section */
 
-The sample finds the locations of the 17 joints for each person in the image and draws a wireframe pose on top of them.
+/* Begin PBXNativeTarget section */
+        4A2D23AD22BB70E400494C55 /* PoseFinder */ = {
+            isa = PBXNativeTarget;
+            buildConfigurationList = 4A2D23C222BB70E500494C55 /* Build configuration list for PBXNativeTarget "PoseFinder" */;
+            buildPhases = (
+                B0DCB73F307FE68045D52A4B /* [CP] Check Pods Manifest.lock */,
+                4A2D23AA22BB70E400494C55 /* Sources */,
+                4A2D23AB22BB70E400494C55 /* Frameworks */,
+                4A2D23AC22BB70E400494C55 /* Resources */,
+                5DF32F87E8206693E122059D /* [CP] Embed Pods Frameworks */,
+                0CCDBC180AEF41F1755A469D /* [CP] Copy Pods Resources */,
+            );
+            buildRules = (
+            );
+            dependencies = (
+            );
+            name = PoseFinder;
+            productName = PoseFinder;
+            productReference = 4A2D23AE22BB70E400494C55 /* PoseFinder.app */;
+            productType = "com.apple.product-type.application";
+        };
+/* End PBXNativeTarget section */
 
-- Note: Starting in iOS 14 and macOS 11, [Vision](https://developer.apple.com/documentation/vision) adds the ability to detect human body poses. For details, see [Detecting Human Body Poses in Images](https://developer.apple.com/documentation/vision/detecting_human_body_poses_in_images).
+/* Begin PBXProject section */
+        4A2D23A622BB70E400494C55 /* Project object */ = {
+            isa = PBXProject;
+            attributes = {
+                LastSwiftUpdateCheck = 1100;
+                LastUpgradeCheck = 1200;
+                ORGANIZATIONNAME = Apple;
+                TargetAttributes = {
+                    4A2D23AD22BB70E400494C55 = {
+                        CreatedOnToolsVersion = 11.0;
+                    };
+                };
+            };
+            buildConfigurationList = 4A2D23A922BB70E400494C55 /* Build configuration list for PBXProject "PoseFinder" */;
+            compatibilityVersion = "Xcode 9.3";
+            developmentRegion = en;
+            hasScannedForEncodings = 0;
+            knownRegions = (
+                en,
+                Base,
+            );
+            mainGroup = 4A2D23A522BB70E400494C55;
+            productRefGroup = 4A2D23AF22BB70E400494C55 /* Products */;
+            projectDirPath = "";
+            projectRoot = "";
+            targets = (
+                4A2D23AD22BB70E400494C55 /* PoseFinder */,
+            );
+        };
+/* End PBXProject section */
 
-## Configure the Capture Session
+/* Begin PBXResourcesBuildPhase section */
+        4A2D23AC22BB70E400494C55 /* Resources */ = {
+            isa = PBXResourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                6D2BDD8928968C0700AE55E9 /* traning.mp4 in Resources */,
+                4A2D23BE22BB70E500494C55 /* LaunchScreen.storyboard in Resources */,
+                6DD7A3162BF37F1A00079E4A /* bg_blue.mp4 in Resources */,
+                4A2D23BB22BB70E500494C55 /* Assets.xcassets in Resources */,
+                4A2D23B922BB70E400494C55 /* Main.storyboard in Resources */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+/* End PBXResourcesBuildPhase section */
 
-The sample starts by getting an image from the device’s built-in camera using an [`AVCaptureSession`](https://developer.apple.com/documentation/avfoundation/avcapturesession) (see [Setting Up a Capture Session](https://developer.apple.com/documentation/avfoundation/cameras_and_media_capture/setting_up_a_capture_session)).
+/* Begin PBXShellScriptBuildPhase section */
+        0CCDBC180AEF41F1755A469D /* [CP] Copy Pods Resources */ = {
+            isa = PBXShellScriptBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            inputFileListPaths = (
+                "${PODS_ROOT}/Target Support Files/Pods-PoseFinder/Pods-PoseFinder-resources-${CONFIGURATION}-input-files.xcfilelist",
+            );
+            name = "[CP] Copy Pods Resources";
+            outputFileListPaths = (
+                "${PODS_ROOT}/Target Support Files/Pods-PoseFinder/Pods-PoseFinder-resources-${CONFIGURATION}-output-files.xcfilelist",
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+            shellPath = /bin/sh;
+            shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PoseFinder/Pods-PoseFinder-resources.sh\"\n";
+            showEnvVarsInLog = 0;
+        };
+        5DF32F87E8206693E122059D /* [CP] Embed Pods Frameworks */ = {
+            isa = PBXShellScriptBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            inputFileListPaths = (
+                "${PODS_ROOT}/Target Support Files/Pods-PoseFinder/Pods-PoseFinder-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+            );
+            name = "[CP] Embed Pods Frameworks";
+            outputFileListPaths = (
+                "${PODS_ROOT}/Target Support Files/Pods-PoseFinder/Pods-PoseFinder-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+            shellPath = /bin/sh;
+            shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-PoseFinder/Pods-PoseFinder-frameworks.sh\"\n";
+            showEnvVarsInLog = 0;
+        };
+        B0DCB73F307FE68045D52A4B /* [CP] Check Pods Manifest.lock */ = {
+            isa = PBXShellScriptBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+            );
+            inputFileListPaths = (
+            );
+            inputPaths = (
+                "${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+                "${PODS_ROOT}/Manifest.lock",
+            );
+            name = "[CP] Check Pods Manifest.lock";
+            outputFileListPaths = (
+            );
+            outputPaths = (
+                "$(DERIVED_FILE_DIR)/Pods-PoseFinder-checkManifestLockResult.txt",
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+            shellPath = /bin/sh;
+            shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+            showEnvVarsInLog = 0;
+        };
+/* End PBXShellScriptBuildPhase section */
 
-``` swift
-if captureSession.isRunning {
-    captureSession.stopRunning()
+/* Begin PBXSourcesBuildPhase section */
+        4A2D23AA22BB70E400494C55 /* Sources */ = {
+            isa = PBXSourcesBuildPhase;
+            buildActionMask = 2147483647;
+            files = (
+                4A2D05D023BF9BBF00D002ED /* PopOverModalViewController.swift in Sources */,
+                0DCEF2C92416701D00ECEC99 /* PoseBuilder+Single.swift in Sources */,
+                0DCEF2CB2416709B00ECEC99 /* PoseBuilder+Multiple.swift in Sources */,
+                0DCEF2C7241666CA00ECEC99 /* PoseBuilder.swift in Sources */,
+                4A6C8A8223E84D1D0080886A /* GradientOverlayView.swift in Sources */,
+                4AA5C4B822BB9CC200277977 /* VideoCapture.swift in Sources */,
+                4AE8C3CF23AD2A74005F9953 /* CGImage+Extension.swift in Sources */,
+                4A0FC5BC23190AD6004886B9 /* CGPoint+Extension.swift in Sources */,
+                4A2D05CE23BF9A2C00D002ED /* ConfigurationViewController.swift in Sources */,
+                6D1B1CC328CD64900013B0E1 /* PlayerView.swift in Sources */,
+                4A97FA952350ABDE00255C7F /* Pose.swift in Sources */,
+                4A2D23B622BB70E400494C55 /* ViewController.swift in Sources */,
+                6D447E0D2D92D3C500CE1449 /* PoseBuilderV2.swift in Sources */,
+                4AE8C3D123AD2D3B005F9953 /* PoseNetInput.swift in Sources */,
+                4AA5C4BA22BBBC2A00277977 /* PoseNet.swift in Sources */,
+                6DD239422A5D93D90007D39A /* ScaledPoseHelper.swift in Sources */,
+                6DF0B1012E00AA1100AA0001 /* PoseSerialization.swift in Sources */,
+                4AE8C3D323AD2D8A005F9953 /* PoseNetOutput.swift in Sources */,
+                0DCEF2CE241676C000ECEC99 /* PoseBuilderConfiguration.swift in Sources */,
+                4ADD52F822BBCF580008FAAC /* Joint.swift in Sources */,
+                6D12FCF22C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel in Sources */,
+                4ADE4C8C2346C07300FFD895 /* AVCaptureVideoOrientation+Extension.swift in Sources */,
+                6DF0B1032E00AA1100AA0001 /* RecordingSessionManager.swift in Sources */,
+                4AE8C3CB23ACDF1C005F9953 /* PoseImageView.swift in Sources */,
+                0D4BB83F249769C800076D64 /* PoseNetMobileNet075S16FP16.mlmodel in Sources */,
+                4A2D23B222BB70E400494C55 /* AppDelegate.swift in Sources */,
+            );
+            runOnlyForDeploymentPostprocessing = 0;
+        };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+        4A2D23B722BB70E400494C55 /* Main.storyboard */ = {
+            isa = PBXVariantGroup;
+            children = (
+                4A2D23B822BB70E400494C55 /* Base */,
+            );
+            name = Main.storyboard;
+            sourceTree = "<group>";
+        };
+        4A2D23BC22BB70E500494C55 /* LaunchScreen.storyboard */ = {
+            isa = PBXVariantGroup;
+            children = (
+                4A2D23BD22BB70E500494C55 /* Base */,
+            );
+            name = LaunchScreen.storyboard;
+            sourceTree = "<group>";
+        };
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+        4A2D23C022BB70E500494C55 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                ALWAYS_SEARCH_USER_PATHS = NO;
+                CLANG_ANALYZER_NONNULL = YES;
+                CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+                CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+                CLANG_CXX_LIBRARY = "libc++";
+                CLANG_ENABLE_MODULES = YES;
+                CLANG_ENABLE_OBJC_ARC = YES;
+                CLANG_ENABLE_OBJC_WEAK = YES;
+                CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+                CLANG_WARN_BOOL_CONVERSION = YES;
+                CLANG_WARN_COMMA = YES;
+                CLANG_WARN_CONSTANT_CONVERSION = YES;
+                CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+                CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+                CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+                CLANG_WARN_EMPTY_BODY = YES;
+                CLANG_WARN_ENUM_CONVERSION = YES;
+                CLANG_WARN_INFINITE_RECURSION = YES;
+                CLANG_WARN_INT_CONVERSION = YES;
+                CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+                CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+                CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+                CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+                CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+                CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+                CLANG_WARN_STRICT_PROTOTYPES = YES;
+                CLANG_WARN_SUSPICIOUS_MOVE = YES;
+                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+                CLANG_WARN_UNREACHABLE_CODE = YES;
+                CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+                COPY_PHASE_STRIP = NO;
+                DEBUG_INFORMATION_FORMAT = dwarf;
+                ENABLE_STRICT_OBJC_MSGSEND = YES;
+                ENABLE_TESTABILITY = YES;
+                GCC_C_LANGUAGE_STANDARD = gnu11;
+                GCC_DYNAMIC_NO_PIC = NO;
+                GCC_NO_COMMON_BLOCKS = YES;
+                GCC_OPTIMIZATION_LEVEL = 0;
+                GCC_PREPROCESSOR_DEFINITIONS = (
+                    "DEBUG=1",
+                    "$(inherited)",
+                );
+                GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+                GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+                GCC_WARN_UNDECLARED_SELECTOR = YES;
+                GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+                GCC_WARN_UNUSED_FUNCTION = YES;
+                GCC_WARN_UNUSED_VARIABLE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+                MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+                MTL_FAST_MATH = YES;
+                ONLY_ACTIVE_ARCH = YES;
+                SDKROOT = iphoneos;
+                SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+                SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+            };
+            name = Debug;
+        };
+        4A2D23C122BB70E500494C55 /* Release */ = {
+            isa = XCBuildConfiguration;
+            buildSettings = {
+                ALWAYS_SEARCH_USER_PATHS = NO;
+                CLANG_ANALYZER_NONNULL = YES;
+                CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+                CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+                CLANG_CXX_LIBRARY = "libc++";
+                CLANG_ENABLE_MODULES = YES;
+                CLANG_ENABLE_OBJC_ARC = YES;
+                CLANG_ENABLE_OBJC_WEAK = YES;
+                CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+                CLANG_WARN_BOOL_CONVERSION = YES;
+                CLANG_WARN_COMMA = YES;
+                CLANG_WARN_CONSTANT_CONVERSION = YES;
+                CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+                CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+                CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+                CLANG_WARN_EMPTY_BODY = YES;
+                CLANG_WARN_ENUM_CONVERSION = YES;
+                CLANG_WARN_INFINITE_RECURSION = YES;
+                CLANG_WARN_INT_CONVERSION = YES;
+                CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+                CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+                CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+                CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+                CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+                CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+                CLANG_WARN_STRICT_PROTOTYPES = YES;
+                CLANG_WARN_SUSPICIOUS_MOVE = YES;
+                CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+                CLANG_WARN_UNREACHABLE_CODE = YES;
+                CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+                COPY_PHASE_STRIP = NO;
+                DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+                ENABLE_NS_ASSERTIONS = NO;
+                ENABLE_STRICT_OBJC_MSGSEND = YES;
+                GCC_C_LANGUAGE_STANDARD = gnu11;
+                GCC_NO_COMMON_BLOCKS = YES;
+                GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+                GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+                GCC_WARN_UNDECLARED_SELECTOR = YES;
+                GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+                GCC_WARN_UNUSED_FUNCTION = YES;
+                GCC_WARN_UNUSED_VARIABLE = YES;
+                IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+                MTL_ENABLE_DEBUG_INFO = NO;
+                MTL_FAST_MATH = YES;
+                SDKROOT = iphoneos;
+                SWIFT_COMPILATION_MODE = wholemodule;
+                SWIFT_OPTIMIZATION_LEVEL = "-O";
+                VALIDATE_PRODUCT = YES;
+            };
+            name = Release;
+        };
+        4A2D23C322BB70E500494C55 /* Debug */ = {
+            isa = XCBuildConfiguration;
+            baseConfigurationReference = E141FCF9BCE9A5F93433101C /* Pods-PoseFinder.debug.xcconfig */;
+            buildSettings = {
+                ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+                CODE_SIGN_STYLE = Automatic;
+                DEVELOPMENT_TEAM = NSF784A69G;
+                INFOPLIST_FILE = PoseFinder/App/Info.plist;
+                LD_RUNPATH_SEARCH_PATHS = (
+                    "$(inherited)",
+                    "@executable_path/Frameworks",
+                );
+                PRODUCT_BUNDLE_IDENTIFIER = "com.hotmail.tujing-.apple-samplecode.posefinder";
+                PRODUCT_NAME = PoseFinder;
+                PROVISIONING_PROFILE_SPECIFIER = "";
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+            };
+            name = Debug;
+        };
+        4A2D23C422BB70E500494C55 /* Release */ = {
+            isa = XCBuildConfiguration;
+            baseConfigurationReference = 45926716BFFD2EB28BE81815 /* Pods-PoseFinder.release.xcconfig */;
+            buildSettings = {
+                ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+                CODE_SIGN_STYLE = Automatic;
+                DEVELOPMENT_TEAM = NSF784A69G;
+                INFOPLIST_FILE = PoseFinder/App/Info.plist;
+                LD_RUNPATH_SEARCH_PATHS = (
+                    "$(inherited)",
+                    "@executable_path/Frameworks",
+                );
+                PRODUCT_BUNDLE_IDENTIFIER = "com.hotmail.tujing-.apple-samplecode.posefinder";
+                PRODUCT_NAME = PoseFinder;
+                PROVISIONING_PROFILE_SPECIFIER = "";
+                SWIFT_VERSION = 5.0;
+                TARGETED_DEVICE_FAMILY = "1,2";
+            };
+            name = Release;
+        };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+        4A2D23A922BB70E400494C55 /* Build configuration list for PBXProject "PoseFinder" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                4A2D23C022BB70E500494C55 /* Debug */,
+                4A2D23C122BB70E500494C55 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+        4A2D23C222BB70E500494C55 /* Build configuration list for PBXNativeTarget "PoseFinder" */ = {
+            isa = XCConfigurationList;
+            buildConfigurations = (
+                4A2D23C322BB70E500494C55 /* Debug */,
+                4A2D23C422BB70E500494C55 /* Release */,
+            );
+            defaultConfigurationIsVisible = 0;
+            defaultConfigurationName = Release;
+        };
+/* End XCConfigurationList section */
+    };
+    rootObject = 4A2D23A622BB70E400494C55 /* Project object */;
 }
-
-captureSession.beginConfiguration()
-
-captureSession.sessionPreset = .vga640x480
-
-try setCaptureSessionInput()
-
-try setCaptureSessionOutput()
-
-captureSession.commitConfiguration()
-```
-
-## Acquire the Captured Image
-
-A video capture session sends each image to the [`captureOutput(_:didOutput:from:)`](https://developer.apple.com/documentation/avfoundation/avcaptureaudiodataoutputsamplebufferdelegate/1386039-captureoutput) method of the [`VideoCapture`](x-source-tag://VideoCapture) class, where the app converts the received [`CMSampleBuffer`](https://developer.apple.com/documentation/coremedia/cmsamplebuffer) into a [`CGImage`](https://developer.apple.com/documentation/coregraphics/cgimage) before passing it to the delegate assigned to the [`VideoCapture`](x-source-tag://VideoCapture) object.
-
-``` swift
-// Attempt to lock the image buffer to gain access to its memory.
-guard CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly) == kCVReturnSuccess
-    else {
-        return
-}
-
-// Create Core Graphics image placeholder.
-var image: CGImage?
-
-// Create a Core Graphics bitmap image from the pixel buffer.
-VTCreateCGImageFromCVPixelBuffer(pixelBuffer, options: nil, imageOut: &image)
-
-// Release the image buffer.
-CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
-
-DispatchQueue.main.sync {
-    delegate.videoCapture(self, didCaptureFrame: image)
-}
-```
-
-## Prepare the Input for the PoseNet Model
-
-After receiving the captured image, the app wraps it in an instance of [`PoseNetInput`](x-source-tag://PoseNetInput), a custom feature provider, to resize the image to the specified size.
-
-``` swift
-// Wrap the image in an instance of PoseNetInput to have it resized
-// before being passed to the PoseNet model.
-let input = PoseNetInput(image: image, size: self.modelInputSize)
-```
-
-## Pass the Input to the PoseNet Model
-
-The sample app then proceeds to pass the input to the PoseNet’s [`prediction`](https://developer.apple.com/documentation/coreml/mlmodel/2880280-prediction) function to obtain its outputs, which the app uses to detect poses.
-
-``` swift
-guard let prediction = try? self.poseNetMLModel.prediction(from: input) else {
-    return
-}
-```
-
-Next, the sample app wraps the PoseNet model outputs in an instance of [`PoseNetOutput`](x-source-tag://PoseNetOutput), along with the model's input size and output stride, before passing it back to the assigned delegate for analysis.
-
-``` swift
-let poseNetOutput = PoseNetOutput(prediction: prediction,
-                                  modelInputSize: self.modelInputSize,
-                                  modelOutputStride: self.outputStride)
-
-DispatchQueue.main.async {
-    self.delegate?.poseNet(self, didPredict: poseNetOutput)
-}
-```
-
-## Analyze the PoseNet Output to Locate Joints
-
-The sample uses one of two algorithms to locate the joints of either one person or multiple persons. The single-person algorithm, the simplest and fastest, inspects the model’s outputs to locate the most prominent joints in the image and uses these joints to construct a single pose.
-
-``` swift
-var pose = Pose()
-
-// For each joint, find its most likely position and associated confidence
-// by querying the heatmap array for the cell with the greatest
-// confidence and using this to compute its position.
-pose.joints.values.forEach { joint in
-    configure(joint: joint)
-}
-
-// Compute and assign the confidence for the pose.
-pose.confidence = pose.joints.values
-    .map { $0.confidence }.reduce(0, +) / Double(Joint.numberOfJoints)
-
-// Map the pose joints positions back onto the original image.
-pose.joints.values.forEach { joint in
-    joint.position = joint.position.applying(modelToInputTransformation)
-}
-
-return pose
-```
-
-The multiple-person algorithm first identifies a set of candidate root joints as starting points. It uses these root joints to find neighboring joints and repeats the process until it has located all 17 joints of each person. For example, the algorithm may find a left knee with a high confidence, and then search for its adjacent joints, the left ankle and left hip.
-
-``` swift
-var detectedPoses = [Pose]()
-
-// Iterate through the joints with the greatest confidence, referred to here as
-// candidate roots, using each as a starting point to assemble a pose.
-for candidateRoot in candidateRoots {
-    // Ignore any candidates that are in the proximity of joints of the
-    // same type and have already been assigned to an existing pose.
-    let maxDistance = configuration.matchingJointDistance
-    guard !detectedPoses.contains(candidateRoot, within: maxDistance) else {
-        continue
-    }
-
-    var pose = assemblePose(from: candidateRoot)
-
-    // Compute the pose's confidence by dividing the sum of all
-    // non-overlapping joints, from existing poses, by the total
-    // number of joints.
-    pose.confidence = confidence(for: pose, detectedPoses: detectedPoses)
-
-    // Ignore any pose that has a confidence less than the assigned threshold.
-    guard pose.confidence >= configuration.poseConfidenceThreshold else {
-        continue
-    }
-
-    detectedPoses.append(pose)
-
-    // Exit early if enough poses have been detected.
-    if detectedPoses.count >= configuration.maxPoseCount {
-        break
-    }
-}
-
-// Map the pose joints positions back onto the original image using
-// the pre-computed transformation matrix.
-detectedPoses.forEach { pose in
-    pose.joints.values.forEach { joint in
-        joint.position = joint.position.applying(modelToInputTransformation)
-    }
-}
-
-return detectedPoses
-```
-
-## Visualize the Detected Poses
-
-For each detected pose, the sample app draws a wireframe over the input image, connecting the lines between the joints and then drawing circles for the joints themselves.
-
-![Illustration of a wireframe of connected joints drawn over a generic human figure performing a yoga tree pose.](Documentation/PoseNetVisualization.png)
-
-``` swift
-let dstImageSize = CGSize(width: frame.width, height: frame.height)
-let dstImageFormat = UIGraphicsImageRendererFormat()
-
-dstImageFormat.scale = 1
-let renderer = UIGraphicsImageRenderer(size: dstImageSize,
-                                       format: dstImageFormat)
-
-let dstImage = renderer.image { rendererContext in
-    // Draw the current frame as the background for the new image.
-    draw(image: frame, in: rendererContext.cgContext)
-
-    for pose in poses {
-        // Draw the segment lines.
-        for segment in PoseImageView.jointSegments {
-            let jointA = pose[segment.jointA]
-            let jointB = pose[segment.jointB]
-
-            guard jointA.isValid, jointB.isValid else {
-                continue
-            }
-
-            drawLine(from: jointA,
-                     to: jointB,
-                     in: rendererContext.cgContext)
-        }
-
-        // Draw the joints as circles above the segment lines.
-        for joint in pose.joints.values.filter({ $0.isValid }) {
-            draw(circle: joint, in: rendererContext.cgContext)
-        }
-    }
-}
-```

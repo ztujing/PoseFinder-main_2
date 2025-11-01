@@ -39,6 +39,7 @@
 		6DD7A3162BF37F1A00079E4A /* bg_blue.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6DD7A3152BF37F1A00079E4A /* bg_blue.mp4 */; };
 		6DF0B1012E00AA1100AA0001 /* PoseSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0B1002E00AA1100AA0001 /* PoseSerialization.swift */; };
 		6DF0B1032E00AA1100AA0001 /* RecordingSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0B1022E00AA1100AA0001 /* RecordingSessionManager.swift */; };
+		6DF0B1052E00AA1100AA0001 /* PoseFinderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0B1042E00AA1100AA0001 /* PoseFinderApp.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -80,6 +81,7 @@
 		6DD7A3152BF37F1A00079E4A /* bg_blue.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = bg_blue.mp4; sourceTree = "<group>"; };
 		6DF0B1002E00AA1100AA0001 /* PoseSerialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseSerialization.swift; sourceTree = "<group>"; };
 		6DF0B1022E00AA1100AA0001 /* RecordingSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingSessionManager.swift; sourceTree = "<group>"; };
+		6DF0B1042E00AA1100AA0001 /* PoseFinderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseFinderApp.swift; sourceTree = "<group>"; };
 		BEE6CF152B804A05BF905D20 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		E141FCF9BCE9A5F93433101C /* Pods-PoseFinder.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PoseFinder.debug.xcconfig"; path = "Target Support Files/Pods-PoseFinder/Pods-PoseFinder.debug.xcconfig"; sourceTree = "<group>"; };
 		F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PoseFinder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -198,6 +200,7 @@
 		6594E5192345489C00D3C44D /* App */ = {
 			isa = PBXGroup;
 			children = (
+				6DF0B1042E00AA1100AA0001 /* PoseFinderApp.swift */,
 				4A2D23B122BB70E400494C55 /* AppDelegate.swift */,
 				4A2D23BF22BB70E500494C55 /* Info.plist */,
 				4A2D23B722BB70E400494C55 /* Main.storyboard */,
@@ -376,6 +379,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4A2D05D023BF9BBF00D002ED /* PopOverModalViewController.swift in Sources */,
+				6DF0B1052E00AA1100AA0001 /* PoseFinderApp.swift in Sources */,
 				0DCEF2C92416701D00ECEC99 /* PoseBuilder+Single.swift in Sources */,
 				0DCEF2CB2416709B00ECEC99 /* PoseBuilder+Multiple.swift in Sources */,
 				0DCEF2C7241666CA00ECEC99 /* PoseBuilder.swift in Sources */,
@@ -477,7 +481,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -532,7 +536,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -550,6 +554,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = NSF784A69G;
 				INFOPLIST_FILE = PoseFinder/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -570,6 +575,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = NSF784A69G;
 				INFOPLIST_FILE = PoseFinder/App/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
