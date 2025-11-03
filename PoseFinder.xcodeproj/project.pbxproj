@@ -40,6 +40,12 @@
 		6DF0B1012E00AA1100AA0001 /* PoseSerialization.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0B1002E00AA1100AA0001 /* PoseSerialization.swift */; };
 		6DF0B1032E00AA1100AA0001 /* RecordingSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0B1022E00AA1100AA0001 /* RecordingSessionManager.swift */; };
 		6DF0B1052E00AA1100AA0001 /* PoseFinderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0B1042E00AA1100AA0001 /* PoseFinderApp.swift */; };
+		267B7034FF984C79BD253DD295913B20 /* TrainingMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA11E594151D4EC78554C6A15778FC7A /* TrainingMenu.swift */; };
+		32A222753FA1468395D40D8C4601C4D8 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EF28FF7C9154C1FAD608432F6511F87 /* HomeViewModel.swift */; };
+		085733C1366E4E5382EF7DAB9B587CF8 /* TrainingMenuDetailViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DFFAB8FBD84843BBD6DCD03FF51C95 /* TrainingMenuDetailViewModel.swift */; };
+		F524F546DAA74893B43F665D11E66D7E /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB6D4E0C9174A15B11E63C98B21ACC2 /* HomeView.swift */; };
+		6A66239D8C984F1A8BEDA31960952EB2 /* TrainingMenuDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2C1D871D9E848BF8FE2CBF0ACE18169 /* TrainingMenuDetailView.swift */; };
+		0A69568898B840E29AD34D5C7EA44A72 /* RecordingSessionContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCF56163A4BB4370BE512C3114683257 /* RecordingSessionContainerView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -82,6 +88,12 @@
 		6DF0B1002E00AA1100AA0001 /* PoseSerialization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseSerialization.swift; sourceTree = "<group>"; };
 		6DF0B1022E00AA1100AA0001 /* RecordingSessionManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingSessionManager.swift; sourceTree = "<group>"; };
 		6DF0B1042E00AA1100AA0001 /* PoseFinderApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseFinderApp.swift; sourceTree = "<group>"; };
+		FA11E594151D4EC78554C6A15778FC7A /* TrainingMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingMenu.swift; sourceTree = "<group>"; };
+		7EF28FF7C9154C1FAD608432F6511F87 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		C7DFFAB8FBD84843BBD6DCD03FF51C95 /* TrainingMenuDetailViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingMenuDetailViewModel.swift; sourceTree = "<group>"; };
+		EEB6D4E0C9174A15B11E63C98B21ACC2 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		C2C1D871D9E848BF8FE2CBF0ACE18169 /* TrainingMenuDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrainingMenuDetailView.swift; sourceTree = "<group>"; };
+		BCF56163A4BB4370BE512C3114683257 /* RecordingSessionContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingSessionContainerView.swift; sourceTree = "<group>"; };
 		BEE6CF152B804A05BF905D20 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
 		E141FCF9BCE9A5F93433101C /* Pods-PoseFinder.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PoseFinder.debug.xcconfig"; path = "Target Support Files/Pods-PoseFinder/Pods-PoseFinder.debug.xcconfig"; sourceTree = "<group>"; };
 		F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_PoseFinder.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -200,6 +212,9 @@
 		6594E5192345489C00D3C44D /* App */ = {
 			isa = PBXGroup;
 			children = (
+				4F0ABF1299344B8FACE73A583E400876 /* Models */,
+				DC1CA6F0911D4AAF9D8920E1C5718F77 /* ViewModels */,
+				7E2DA19C2F674DA9833887EAC6C9A6BC /* Views */,
 				6DF0B1042E00AA1100AA0001 /* PoseFinderApp.swift */,
 				4A2D23B122BB70E400494C55 /* AppDelegate.swift */,
 				4A2D23BF22BB70E500494C55 /* Info.plist */,
@@ -208,6 +223,33 @@
 				4A2D23BA22BB70E500494C55 /* Assets.xcassets */,
 			);
 			path = App;
+			sourceTree = "<group>";
+		};
+		4F0ABF1299344B8FACE73A583E400876 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				FA11E594151D4EC78554C6A15778FC7A /* TrainingMenu.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		DC1CA6F0911D4AAF9D8920E1C5718F77 /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				7EF28FF7C9154C1FAD608432F6511F87 /* HomeViewModel.swift */,
+				C7DFFAB8FBD84843BBD6DCD03FF51C95 /* TrainingMenuDetailViewModel.swift */,
+			);
+			path = ViewModels;
+			sourceTree = "<group>";
+		};
+		7E2DA19C2F674DA9833887EAC6C9A6BC /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				EEB6D4E0C9174A15B11E63C98B21ACC2 /* HomeView.swift */,
+				C2C1D871D9E848BF8FE2CBF0ACE18169 /* TrainingMenuDetailView.swift */,
+				BCF56163A4BB4370BE512C3114683257 /* RecordingSessionContainerView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		6594E51A23454A2300D3C44D /* UI */ = {
@@ -404,6 +446,12 @@
 				6DF0B1032E00AA1100AA0001 /* RecordingSessionManager.swift in Sources */,
 				4AE8C3CB23ACDF1C005F9953 /* PoseImageView.swift in Sources */,
 				0D4BB83F249769C800076D64 /* PoseNetMobileNet075S16FP16.mlmodel in Sources */,
+				0A69568898B840E29AD34D5C7EA44A72 /* RecordingSessionContainerView.swift in Sources */,
+				F524F546DAA74893B43F665D11E66D7E /* HomeView.swift in Sources */,
+				267B7034FF984C79BD253DD295913B20 /* TrainingMenu.swift in Sources */,
+				32A222753FA1468395D40D8C4601C4D8 /* HomeViewModel.swift in Sources */,
+				085733C1366E4E5382EF7DAB9B587CF8 /* TrainingMenuDetailViewModel.swift in Sources */,
+				6A66239D8C984F1A8BEDA31960952EB2 /* TrainingMenuDetailView.swift in Sources */,
 				4A2D23B222BB70E400494C55 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

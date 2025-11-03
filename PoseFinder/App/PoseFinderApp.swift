@@ -7,7 +7,30 @@ struct PoseFinderApp: App {
 
     var body: some Scene {
         WindowGroup {
-            LegacyRootView()
+            if CommandLine.arguments.contains("-UseLegacyUI") {
+                LegacyRootView()
+            } else {
+                RootNavigationView()
+            }
+        }
+    }
+}
+
+private struct RootNavigationView: View {
+    @StateObject private var homeViewModel = HomeViewModel()
+
+    var body: some View {
+        Group {
+            if #available(iOS 16.0, *) {
+                NavigationStack {
+                    HomeView(viewModel: homeViewModel)
+                }
+            } else {
+                NavigationView {
+                    HomeView(viewModel: homeViewModel)
+                }
+                .navigationViewStyle(.stack)
+            }
         }
     }
 }
