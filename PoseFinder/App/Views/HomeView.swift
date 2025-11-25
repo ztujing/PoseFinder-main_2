@@ -11,6 +11,11 @@ struct HomeView: View {
         }
         .listStyle(.insetGrouped)
         .navigationTitle("トレーニングメニュー")
+        .toolbar {
+            NavigationLink(destination: SessionListView(viewModel: SessionListViewModel()).navigationTitle("セッション履歴")) {
+                Label("履歴", systemImage: "clock.arrow.circlepath")
+            }
+        }
     }
 }
 
