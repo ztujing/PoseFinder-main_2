@@ -3,7 +3,7 @@
 - **Date**: 2025-10-30
 - **Owner**: @tujing
 - **Scope**: FE | Docs
-- **Status**: Draft
+- **Status**: Approved
 
 ## 1. 背景 / 目的（Context & Goals）
 - フェーズ2で SwiftUI 製ホーム/メニュー詳細→既存録画画面への遷移を整備したが、録画後のセッション確認は依然として UIKit 依存のまま。

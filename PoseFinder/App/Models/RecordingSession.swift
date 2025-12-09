@@ -39,4 +39,5 @@ struct RecordingSession: Identifiable, Hashable {
 
     var videoURL: URL? { video?.url }
     var poseURL: URL? { pose?.url }
+    var isComplete: Bool { video != nil && pose != nil }
 }

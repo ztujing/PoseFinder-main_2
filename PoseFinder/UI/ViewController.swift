@@ -102,6 +102,7 @@ class ViewController: UIViewController {
 
     private let recordingSessionManager = RecordingSessionManager()
     private var isRecordingSessionActive = false
+    private var hasRequestedSessionCancellation = false
     
     //teacherScaledPoseプロパティを追加
     var teacherPose: Pose = Pose()
@@ -128,6 +129,10 @@ class ViewController: UIViewController {
         setupPoseDetectors()
         setupAndBeginCapturingVideoFrames()
         setupAndBeginCapturingMovieFrames()
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleRecordingSessionCancelRequest),
+                                               name: .recordingSessionShouldCancel,
+                                               object: nil)
     }
 
     deinit {
@@ -247,6 +252,7 @@ class ViewController: UIViewController {
             try recordingSessionManager.start(cameraPosition: videoCapture.cameraPostion,
                                               preset: videoCapture.captureSession.sessionPreset)
             isRecordingSessionActive = true
+            hasRequestedSessionCancellation = false
         } catch {
             print("Recording session start failed: \(error)")
         }
@@ -268,6 +274,14 @@ class ViewController: UIViewController {
     @objc private func handlePlaybackDidFinish(_ notification: Notification) {
         stopRecordingSession()
     }
+
+    @objc private func handleRecordingSessionCancelRequest(_ notification: Notification) {
+        guard !hasRequestedSessionCancellation else { return }
+        hasRequestedSessionCancellation = true
+        isRecordingSessionActive = false
+        recordingSessionManager.cancel()
+        player?.pause()
+    }
     private func setupAndBeginCapturingVideoFrames() {
         videoCapture.setUpAVCapture { error in
             if let error = error {
@@ -283,7 +297,9 @@ class ViewController: UIViewController {
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        stopRecordingSession()
+        if isRecordingSessionActive && !hasRequestedSessionCancellation {
+            stopRecordingSession()
+        }
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
         videoCapture.stopCapturing {
             super.viewWillDisappear(animated)

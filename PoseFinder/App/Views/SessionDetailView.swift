@@ -2,7 +2,7 @@ import AVKit
 import SwiftUI
 
 struct SessionDetailView: View {
-    @ObservedObject var viewModel: SessionDetailViewModel
+    @StateObject private var viewModel: SessionDetailViewModel
     @State private var isVideoPlaying = false
 
     private let dateFormatter: DateFormatter = {
@@ -13,9 +13,24 @@ struct SessionDetailView: View {
         return formatter
     }()
 
+    init(viewModel: SessionDetailViewModel) {
+        _viewModel = StateObject(wrappedValue: viewModel)
+    }
+
+    init(session: RecordingSession) {
+        _viewModel = StateObject(wrappedValue: SessionDetailViewModel(session: session))
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
+                if viewModel.isReloading && viewModel.session.video == nil && viewModel.posePreview == nil {
+                    VStack(spacing: 16) {
+                        ProgressView("最新データを読み込み中…")
+                            .progressViewStyle(.circular)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
                 videoSection
                 poseSection
                 metadataSection
@@ -28,6 +43,10 @@ struct SessionDetailView: View {
         .onDisappear {
             viewModel.player?.pause()
         }
+        .onAppear {
+            print("SessionDetailView onAppear at \(Date())")
+            viewModel.reloadSessionWithDelay()
+        }
     }
 
     @ViewBuilder
@@ -36,6 +55,11 @@ struct SessionDetailView: View {
             Text("動画")
                 .font(.title3)
                 .fontWeight(.semibold)
+            #if DEBUG
+            Text("DEBUG: video file = \(viewModel.session.video?.fileName ?? "nil")")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            #endif
             if let player = viewModel.player {
                 VideoPlayer(player: player)
                     .frame(height: 240)
@@ -59,6 +83,11 @@ struct SessionDetailView: View {
             Text("Pose プレビュー")
                 .font(.title3)
                 .fontWeight(.semibold)
+            #if DEBUG
+            Text("DEBUG: pose preview loaded = \(viewModel.posePreview != nil ? "true" : "false")")
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+            #endif
             if let frame = viewModel.posePreview {
                 PosePreviewView(poseFrame: frame)
                     .frame(height: 240)

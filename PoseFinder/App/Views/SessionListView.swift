@@ -27,20 +27,14 @@ struct SessionListView: View {
                 }
             } else {
                 ForEach(viewModel.sessions) { session in
-                    NavigationLink(destination: SessionDetailView(viewModel: SessionDetailViewModel(session: session))) {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(session.id)
-                                .font(.headline)
-                            Text(dateFormatter.string(from: session.createdAt))
-                                .font(.subheadline)
-                                .foregroundStyle(.secondary)
-                            if let video = session.video {
-                                Text(video.fileName)
-                                    .font(.caption)
-                                    .foregroundStyle(.tertiary)
-                            }
+                    if session.isComplete {
+                        NavigationLink(destination: SessionDetailView(viewModel: SessionDetailViewModel(session: session))) {
+                            sessionRowContent(for: session, showIncompleteMessage: false)
                         }
-                        .padding(.vertical, 4)
+                    } else {
+                        sessionRowContent(for: session, showIncompleteMessage: true)
+                            .contentShape(Rectangle())
+                            .allowsHitTesting(false)
                     }
                 }
             }
@@ -54,5 +48,26 @@ struct SessionListView: View {
         .refreshable {
             viewModel.refresh()
         }
+    }
+
+    private func sessionRowContent(for session: RecordingSession, showIncompleteMessage: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(session.id)
+                .font(.headline)
+            Text(dateFormatter.string(from: session.createdAt))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+            if let video = session.video {
+                Text(video.fileName)
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+            }
+            if showIncompleteMessage {
+                Text("中断されたため正しく保存されませんでした。")
+                    .font(.caption)
+                    .foregroundStyle(.red)
+            }
+        }
+        .padding(.vertical, 4)
     }
 }

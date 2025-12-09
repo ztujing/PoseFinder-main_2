@@ -188,7 +188,9 @@ private extension RecordingSessionRepository {
         let videoURL = directoryURL.appendingPathComponent(metadata.video.file)
         let poseURL = directoryURL.appendingPathComponent(metadata.pose.file)
 
-        let videoInfo: RecordingSession.VideoInfo? = fileManager.fileExists(atPath: videoURL.path) ?
+        let videoSize = fileSize(at: videoURL)
+        let videoExists = fileManager.fileExists(atPath: videoURL.path) && (videoSize ?? 0) > 0
+        let videoInfo: RecordingSession.VideoInfo? = videoExists ?
             RecordingSession.VideoInfo(
                 fileName: metadata.video.file,
                 codec: metadata.video.codec,
@@ -198,16 +200,18 @@ private extension RecordingSessionRepository {
                 },
                 fps: metadata.video.fps,
                 url: videoURL,
-                fileSizeBytes: fileSize(at: videoURL)
+                fileSizeBytes: videoSize
             ) : nil
 
-        let poseInfo: RecordingSession.PoseInfo? = fileManager.fileExists(atPath: poseURL.path) ?
+        let poseSize = fileSize(at: poseURL)
+        let poseExists = fileManager.fileExists(atPath: poseURL.path) && (poseSize ?? 0) > 0
+        let poseInfo: RecordingSession.PoseInfo? = poseExists ?
             RecordingSession.PoseInfo(
                 fileName: metadata.pose.file,
                 jointSet: metadata.pose.jointSet,
                 coords: metadata.pose.coords,
                 url: poseURL,
-                fileSizeBytes: fileSize(at: poseURL)
+                fileSizeBytes: poseSize
             ) : nil
 
         return RecordingSession(

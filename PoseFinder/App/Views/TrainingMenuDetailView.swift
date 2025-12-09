@@ -51,8 +51,7 @@ struct TrainingMenuDetailView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             NavigationLink {
-                RecordingSessionContainerView()
-                    .ignoresSafeArea()
+                RecordingSessionScreen()
                     .navigationTitle("撮影")
                     .navigationBarTitleDisplayMode(.inline)
             } label: {
