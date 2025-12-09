@@ -3,6 +3,7 @@ import UIKit
 
 extension Notification.Name {
     static let recordingSessionShouldCancel = Notification.Name("RecordingSessionShouldCancel")
+    static let recordingSessionDidComplete = Notification.Name("RecordingSessionDidComplete")
 }
 
 struct RecordingSessionContainerView: UIViewControllerRepresentable {
@@ -25,6 +26,7 @@ struct RecordingSessionContainerView: UIViewControllerRepresentable {
 struct RecordingSessionScreen: View {
     @Environment(\.dismiss) private var dismiss
     @State private var isShowingCancelAlert = false
+    @State private var sessionCompleted = false
 
     var body: some View {
         RecordingSessionContainerView()
@@ -33,7 +35,11 @@ struct RecordingSessionScreen: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
-                        isShowingCancelAlert = true
+                        if sessionCompleted {
+                            dismiss()
+                        } else {
+                            isShowingCancelAlert = true
+                        }
                     } label: {
                         Label("戻る", systemImage: "chevron.backward")
                     }
@@ -47,6 +53,12 @@ struct RecordingSessionScreen: View {
                 Button("続ける", role: .cancel) {}
             } message: {
                 Text("中断した場合は保存されません。")
+            }
+            .onAppear {
+                sessionCompleted = false
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .recordingSessionDidComplete)) { _ in
+                sessionCompleted = true
             }
     }
 }

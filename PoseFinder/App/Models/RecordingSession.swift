@@ -2,6 +2,8 @@ import CoreGraphics
 import Foundation
 
 struct RecordingSession: Identifiable, Hashable {
+    static let incompleteMarkerFilename = ".session_incomplete"
+
     struct DeviceInfo: Hashable {
         let model: String
         let os: String
@@ -36,8 +38,9 @@ struct RecordingSession: Identifiable, Hashable {
     let camera: CameraInfo
     let video: VideoInfo?
     let pose: PoseInfo?
+    let hasIncompleteMarker: Bool
 
     var videoURL: URL? { video?.url }
     var poseURL: URL? { pose?.url }
-    var isComplete: Bool { video != nil && pose != nil }
+    var isComplete: Bool { !hasIncompleteMarker && video != nil && pose != nil }
 }

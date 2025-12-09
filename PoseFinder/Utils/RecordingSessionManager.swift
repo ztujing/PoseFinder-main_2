@@ -157,6 +157,7 @@ final class RecordingSessionManager {
         static let videoCodec = "h264"
         static let poseJointSet = "coco17"
         static let poseCoords = "normalized"
+        static let incompleteMarkerFilename = RecordingSession.incompleteMarkerFilename
     }
 
     // MARK: - Public API
@@ -171,6 +172,7 @@ final class RecordingSessionManager {
             let directory = sessionsRoot.appendingPathComponent(sessionId, isDirectory: true)
             do {
                 try fileManager.createDirectory(at: directory, withIntermediateDirectories: true, attributes: nil)
+                createIncompleteMarker(at: directory)
             } catch {
                 throw RecordingError.directoryCreationFailed
             }
@@ -262,6 +264,7 @@ final class RecordingSessionManager {
                 self.finalizeMetadata(for: state)
                 do {
                     try self.writeMetadata(for: state)
+                    self.removeIncompleteMarker(at: state.directoryURL)
                     completion?(.success(directoryURL))
                 } catch {
                     completion?(.failure(error))
@@ -338,6 +341,18 @@ final class RecordingSessionManager {
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
         let data = try encoder.encode(state.metadata)
         try data.write(to: url, options: .atomic)
+    }
+
+    private func createIncompleteMarker(at directory: URL) {
+        let markerURL = directory.appendingPathComponent(Constants.incompleteMarkerFilename)
+        if !fileManager.fileExists(atPath: markerURL.path) {
+            _ = fileManager.createFile(atPath: markerURL.path, contents: nil, attributes: nil)
+        }
+    }
+
+    private func removeIncompleteMarker(at directory: URL) {
+        let markerURL = directory.appendingPathComponent(Constants.incompleteMarkerFilename)
+        try? fileManager.removeItem(at: markerURL)
     }
 
     private func prepareAssetWriterIfNeeded(using sampleBuffer: CMSampleBuffer, state: SessionState) throws {

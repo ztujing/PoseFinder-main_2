@@ -12,38 +12,36 @@ struct SessionListView: View {
     }()
 
     var body: some View {
-        List {
-            if viewModel.isLoading {
-                ProgressView("読み込み中…")
-            } else if let error = viewModel.errorMessage {
-                Section {
-                    Text(error)
-                        .foregroundStyle(.red)
-                }
-            } else if viewModel.sessions.isEmpty {
-                Section {
-                    Text("録画済みセッションがありません")
-                        .foregroundStyle(.secondary)
+        List(viewModel.sessions) { session in
+            if session.isComplete {
+                // Use iOS 15 compatible NavigationLink initializer
+                NavigationLink(destination: SessionDetailView(session: session)) {
+                    sessionRowContent(for: session, showIncompleteMessage: false)
                 }
             } else {
-                ForEach(viewModel.sessions) { session in
-                    if session.isComplete {
-                        NavigationLink(destination: SessionDetailView(viewModel: SessionDetailViewModel(session: session))) {
-                            sessionRowContent(for: session, showIncompleteMessage: false)
-                        }
-                    } else {
-                        sessionRowContent(for: session, showIncompleteMessage: true)
-                            .contentShape(Rectangle())
-                            .allowsHitTesting(false)
-                    }
-                }
+                sessionRowContent(for: session, showIncompleteMessage: true)
+                    .contentShape(Rectangle())
+                    .allowsHitTesting(false)
+            }
+        }
+        .overlay(alignment: .center) {
+            if viewModel.isLoading {
+                ProgressView("読み込み中…")
+                    .padding()
+                    .background(.thinMaterial)
+                    .cornerRadius(8)
+            } else if let error = viewModel.errorMessage {
+                Text(error)
+                    .foregroundStyle(.red)
+                    .padding()
+            } else if viewModel.sessions.isEmpty {
+                Text("録画済みセッションがありません")
+                    .foregroundStyle(.secondary)
             }
         }
         .navigationTitle("セッション履歴")
         .onAppear {
-            if viewModel.sessions.isEmpty {
-                viewModel.refresh()
-            }
+            viewModel.refresh()
         }
         .refreshable {
             viewModel.refresh()

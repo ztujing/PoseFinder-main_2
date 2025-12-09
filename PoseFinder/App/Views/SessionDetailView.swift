@@ -13,10 +13,6 @@ struct SessionDetailView: View {
         return formatter
     }()
 
-    init(viewModel: SessionDetailViewModel) {
-        _viewModel = StateObject(wrappedValue: viewModel)
-    }
-
     init(session: RecordingSession) {
         _viewModel = StateObject(wrappedValue: SessionDetailViewModel(session: session))
     }

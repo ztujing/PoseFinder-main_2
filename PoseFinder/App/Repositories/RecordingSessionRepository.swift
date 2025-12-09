@@ -25,6 +25,17 @@ struct RecordingSessionRepository {
         }
     }
 
+    func reloadSession(at directoryURL: URL) -> Result<RecordingSession, Error> {
+        do {
+            guard let session = try loadSession(at: directoryURL) else {
+                throw RepositoryError.metadataMissing(directoryURL.appendingPathComponent("session.json"))
+            }
+            return .success(session)
+        } catch {
+            return .failure(error)
+        }
+    }
+
     func loadFirstPoseFrame(from url: URL) -> Result<PoseFrame, Error> {
         do {
             guard fileManager.fileExists(atPath: url.path) else {
@@ -189,7 +200,7 @@ private extension RecordingSessionRepository {
         let poseURL = directoryURL.appendingPathComponent(metadata.pose.file)
 
         let videoSize = fileSize(at: videoURL)
-        let videoExists = fileManager.fileExists(atPath: videoURL.path) && (videoSize ?? 0) > 0
+        let videoExists = fileManager.fileExists(atPath: videoURL.path)
         let videoInfo: RecordingSession.VideoInfo? = videoExists ?
             RecordingSession.VideoInfo(
                 fileName: metadata.video.file,
@@ -204,7 +215,7 @@ private extension RecordingSessionRepository {
             ) : nil
 
         let poseSize = fileSize(at: poseURL)
-        let poseExists = fileManager.fileExists(atPath: poseURL.path) && (poseSize ?? 0) > 0
+        let poseExists = fileManager.fileExists(atPath: poseURL.path)
         let poseInfo: RecordingSession.PoseInfo? = poseExists ?
             RecordingSession.PoseInfo(
                 fileName: metadata.pose.file,
@@ -214,6 +225,9 @@ private extension RecordingSessionRepository {
                 fileSizeBytes: poseSize
             ) : nil
 
+        let incompleteMarkerURL = directoryURL.appendingPathComponent(RecordingSession.incompleteMarkerFilename)
+        let hasIncompleteMarker = fileManager.fileExists(atPath: incompleteMarkerURL.path)
+
         return RecordingSession(
             id: metadata.sessionId,
             createdAt: createdAt,
@@ -221,7 +235,8 @@ private extension RecordingSessionRepository {
             device: .init(model: metadata.device.model, os: metadata.device.os),
             camera: .init(position: metadata.camera.position, preset: metadata.camera.preset),
             video: videoInfo,
-            pose: poseInfo
+            pose: poseInfo,
+            hasIncompleteMarker: hasIncompleteMarker
         )
     }
 

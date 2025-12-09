@@ -69,6 +69,14 @@ final class TeacherStudentRatio {
     //    }
 }
 class ViewController: UIViewController {
+    private enum RecordingState {
+        case idle
+        case recording
+        case stopping
+        case completed
+        case cancelled
+    }
+
     /// The view the controller uses to visualize the detected poses.
     @IBOutlet private var videoPreviewImageView: PoseImageView!
     @IBOutlet private var moviePreviewImageView: PoseImageView!
@@ -103,6 +111,8 @@ class ViewController: UIViewController {
     private let recordingSessionManager = RecordingSessionManager()
     private var isRecordingSessionActive = false
     private var hasRequestedSessionCancellation = false
+    private var recordingState: RecordingState = .idle
+    private var shouldMarkSessionIncomplete = false
     
     //teacherScaledPoseプロパティを追加
     var teacherPose: Pose = Pose()
@@ -132,6 +142,14 @@ class ViewController: UIViewController {
         NotificationCenter.default.addObserver(self,
                                                selector: #selector(handleRecordingSessionCancelRequest),
                                                name: .recordingSessionShouldCancel,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleAppWillResignActive),
+                                               name: UIApplication.willResignActiveNotification,
+                                               object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleAppWillTerminate),
+                                               name: UIApplication.willTerminateNotification,
                                                object: nil)
     }
 
@@ -253,6 +271,8 @@ class ViewController: UIViewController {
                                               preset: videoCapture.captureSession.sessionPreset)
             isRecordingSessionActive = true
             hasRequestedSessionCancellation = false
+            recordingState = .recording
+            shouldMarkSessionIncomplete = false
         } catch {
             print("Recording session start failed: \(error)")
         }
@@ -261,17 +281,30 @@ class ViewController: UIViewController {
     private func stopRecordingSession() {
         guard isRecordingSessionActive else { return }
         isRecordingSessionActive = false
+        let markIncomplete = shouldMarkSessionIncomplete
         recordingSessionManager.stop { result in
-            switch result {
-            case .success(let directoryURL):
-                print("Saved to: \(directoryURL.path)")
-            case .failure(let error):
-                print("Recording session stop failed: \(error)")
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let directoryURL):
+                    if markIncomplete {
+                        self.recreateIncompleteMarker(at: directoryURL)
+                        self.recordingState = .cancelled
+                    } else {
+                        self.recordingState = .completed
+                        NotificationCenter.default.post(name: .recordingSessionDidComplete, object: nil)
+                    }
+                    print("Saved to: \(directoryURL.path)")
+                case .failure(let error):
+                    print("Recording session stop failed: \(error)")
+                }
+                self.shouldMarkSessionIncomplete = false
             }
         }
     }
 
     @objc private func handlePlaybackDidFinish(_ notification: Notification) {
+        recordingState = .stopping
+        shouldMarkSessionIncomplete = false
         stopRecordingSession()
     }
 
@@ -281,6 +314,8 @@ class ViewController: UIViewController {
         isRecordingSessionActive = false
         recordingSessionManager.cancel()
         player?.pause()
+        shouldMarkSessionIncomplete = false
+        recordingState = .cancelled
     }
     private func setupAndBeginCapturingVideoFrames() {
         videoCapture.setUpAVCapture { error in
@@ -297,7 +332,7 @@ class ViewController: UIViewController {
     }
 
     override func viewWillDisappear(_ animated: Bool) {
-        if isRecordingSessionActive && !hasRequestedSessionCancellation {
+        if isRecordingSessionActive && !hasRequestedSessionCancellation && recordingState == .recording {
             stopRecordingSession()
         }
         NotificationCenter.default.removeObserver(self, name: .AVPlayerItemDidPlayToEndTime, object: nil)
@@ -327,6 +362,29 @@ class ViewController: UIViewController {
         }
         
         algorithm = selectedAlgorithm
+    }
+}
+
+// MARK: - App Lifecycle handling
+
+extension ViewController {
+    @objc private func handleAppWillResignActive(_ notification: Notification) {
+        if recordingState == .recording {
+            shouldMarkSessionIncomplete = true
+        }
+    }
+
+    @objc private func handleAppWillTerminate(_ notification: Notification) {
+        if recordingState == .recording {
+            shouldMarkSessionIncomplete = true
+        }
+    }
+
+    private func recreateIncompleteMarker(at directoryURL: URL) {
+        let markerURL = directoryURL.appendingPathComponent(RecordingSession.incompleteMarkerFilename)
+        if !FileManager.default.fileExists(atPath: markerURL.path) {
+            FileManager.default.createFile(atPath: markerURL.path, contents: nil, attributes: nil)
+        }
     }
 }
 
