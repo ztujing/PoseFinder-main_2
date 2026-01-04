@@ -35,6 +35,8 @@ struct SessionDetailView: View {
             .padding(.bottom, 32)
         }
         .navigationTitle("セッション詳細")
+        
+        
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear {
             viewModel.player?.pause()
@@ -51,15 +53,12 @@ struct SessionDetailView: View {
             Text("動画")
                 .font(.title3)
                 .fontWeight(.semibold)
-            #if DEBUG
-            Text("DEBUG: video file = \(viewModel.session.video?.fileName ?? "nil")")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            #endif
+            
             if let player = viewModel.player {
                 VideoPlayer(player: player)
                     .frame(height: 240)
-                    .cornerRadius(12)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipped()
                     .onAppear {
                         if !isVideoPlaying {
                             player.play()
@@ -76,19 +75,16 @@ struct SessionDetailView: View {
     @ViewBuilder
     private var poseSection: some View {
         VStack(alignment: .leading, spacing: 12) {
+
             Text("Pose プレビュー")
                 .font(.title3)
                 .fontWeight(.semibold)
-            #if DEBUG
-            Text("DEBUG: pose preview loaded = \(viewModel.posePreview != nil ? "true" : "false")")
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            #endif
+
             if let frame = viewModel.posePreview {
                 PosePreviewView(poseFrame: frame)
                     .frame(height: 240)
-                    .background(Color(UIColor.secondarySystemBackground))
-                    .cornerRadius(12)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                    .clipped()
             } else if let error = viewModel.errorMessage {
                 Text(error)
                     .foregroundStyle(.secondary)
@@ -102,6 +98,7 @@ struct SessionDetailView: View {
     @ViewBuilder
     private var metadataSection: some View {
         VStack(alignment: .leading, spacing: 16) {
+
             Text("メタ情報")
                 .font(.title3)
                 .fontWeight(.semibold)

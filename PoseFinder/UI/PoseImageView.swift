@@ -10,6 +10,27 @@ import UIKit
 @IBDesignable
 class PoseImageView: UIImageView {
     
+    override var intrinsicContentSize: CGSize {
+        // 画像サイズで自己主張しない。SwiftUI側の.frame(height: 240)に従わせる
+        return .zero
+    }
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonInit()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        commonInit()
+    }
+
+    private func commonInit() {
+        contentMode = .scaleAspectFit
+        clipsToBounds = true
+        backgroundColor = UIColor.clear
+    }
+    
     // 教師と生徒の色を定義
     let teacherColor = UIColor.blue
     let studentColor = UIColor.red

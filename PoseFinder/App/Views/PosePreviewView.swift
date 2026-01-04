@@ -5,7 +5,7 @@ struct PosePreviewView: UIViewRepresentable {
     let poseFrame: PoseFrame
 
     func makeUIView(context: Context) -> PoseImageView {
-        PoseImageView()
+        PoseImageView(frame: .zero)
     }
 
     func updateUIView(_ uiView: PoseImageView, context: Context) {

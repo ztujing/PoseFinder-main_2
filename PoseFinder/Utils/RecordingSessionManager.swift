@@ -35,6 +35,7 @@ final class RecordingSessionManager {
         var frameCount: Int64 = 0
         var videoDimensions: CMVideoDimensions?
         var isStopping = false
+        var pendingPoses: [(pose: Pose, timestamp: CMTime, imageSize: CGSize)] = []
 
         var metadata: SessionMetadata
 
@@ -158,6 +159,7 @@ final class RecordingSessionManager {
         static let poseJointSet = "coco17"
         static let poseCoords = "normalized"
         static let incompleteMarkerFilename = RecordingSession.incompleteMarkerFilename
+        static let maxPendingPoses = 300
     }
 
     // MARK: - Public API
@@ -215,6 +217,30 @@ final class RecordingSessionManager {
                 writer.startSession(atSourceTime: timestamp)
                 state.firstVideoTimestamp = timestamp
                 state.hasStartedWriting = true
+
+                if !state.pendingPoses.isEmpty {
+                    if let poseWriter = state.poseWriter {
+                        let referenceTimestamp = timestamp
+                        for pending in state.pendingPoses {
+                            let rawMs = PoseSerialization.timestampMs(
+                                for: pending.timestamp,
+                                relativeTo: referenceTimestamp
+                            )
+                            let tMs = max(0, rawMs)
+                            do {
+                                let data = try PoseSerialization.makeNDJSONLine(
+                                    pose: pending.pose,
+                                    timestampMs: tMs,
+                                    imageSize: pending.imageSize
+                                )
+                                poseWriter.append(data)
+                            } catch {
+                                print("RecordingSessionManager pending pose serialization failed: \(error)")
+                            }
+                        }
+                    }
+                    state.pendingPoses.removeAll()
+                }
             }
 
             if input.isReadyForMoreMediaData {
@@ -237,6 +263,13 @@ final class RecordingSessionManager {
         queue.async { [weak self] in
             guard let self = self, let state = self.state, !state.isStopping else { return }
             guard let poseWriter = state.poseWriter else { return }
+            if state.firstVideoTimestamp == nil {
+                state.pendingPoses.append((pose: pose, timestamp: timestamp, imageSize: imageSize))
+                if state.pendingPoses.count > Constants.maxPendingPoses {
+                    state.pendingPoses.removeFirst(state.pendingPoses.count - Constants.maxPendingPoses)
+                }
+                return
+            }
             guard let firstTimestamp = state.firstVideoTimestamp else { return }
             let tMs = PoseSerialization.timestampMs(for: timestamp, relativeTo: firstTimestamp)
             do {

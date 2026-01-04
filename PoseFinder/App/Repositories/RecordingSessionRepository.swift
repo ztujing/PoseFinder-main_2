@@ -42,6 +42,10 @@ struct RecordingSessionRepository {
                 throw RepositoryError.fileNotFound(url)
             }
 
+            if let size = fileSize(at: url), size == 0 {
+                throw RepositoryError.emptyPoseFile
+            }
+
             let handle = try FileHandle(forReadingFrom: url)
             defer {
                 try? handle.close()
@@ -89,6 +93,7 @@ extension RecordingSessionRepository {
         case malformedMetadata(URL)
         case fileNotFound(URL)
         case poseFrameNotFound
+        case emptyPoseFile
     }
 }
 
@@ -105,6 +110,8 @@ extension RecordingSessionRepository.RepositoryError: LocalizedError {
             return "必要なファイルが見つかりません: \(url.lastPathComponent)"
         case .poseFrameNotFound:
             return "Pose データの先頭フレームを読み込めませんでした。"
+        case .emptyPoseFile:
+            return "Pose データが記録されませんでした（録画が短すぎた可能性があります）。"
         }
     }
 }
@@ -199,8 +206,24 @@ private extension RecordingSessionRepository {
         let videoURL = directoryURL.appendingPathComponent(metadata.video.file)
         let poseURL = directoryURL.appendingPathComponent(metadata.pose.file)
 
+        let incompleteMarkerURL = directoryURL.appendingPathComponent(RecordingSession.incompleteMarkerFilename)
+        let hasIncompleteMarker = fileManager.fileExists(atPath: incompleteMarkerURL.path)
+        
         let videoSize = fileSize(at: videoURL)
         let videoExists = fileManager.fileExists(atPath: videoURL.path)
+
+        let poseSize = fileSize(at: poseURL)
+        let poseExists = fileManager.fileExists(atPath: poseURL.path)
+        
+
+        print("[Repository] directoryURL = \(directoryURL.path)")
+        print("[Repository] metadataURL  = \(metadataURL.path)")
+        print("[Repository] video path   = \(videoURL.path) exists=\(videoExists) size=\(String(describing: videoSize))")
+        print("[Repository] pose path    = \(poseURL.path) exists=\(poseExists) size=\(String(describing: poseSize))")
+        print("[Repository] incomplete marker = \(hasIncompleteMarker) (\(directoryURL.appendingPathComponent(RecordingSession.incompleteMarkerFilename).path))")
+        print("[Repository] metadata video.file = \(metadata.video.file)")
+        print("[Repository] metadata pose.file  = \(metadata.pose.file)")
+
         let videoInfo: RecordingSession.VideoInfo? = videoExists ?
             RecordingSession.VideoInfo(
                 fileName: metadata.video.file,
@@ -213,9 +236,7 @@ private extension RecordingSessionRepository {
                 url: videoURL,
                 fileSizeBytes: videoSize
             ) : nil
-
-        let poseSize = fileSize(at: poseURL)
-        let poseExists = fileManager.fileExists(atPath: poseURL.path)
+        
         let poseInfo: RecordingSession.PoseInfo? = poseExists ?
             RecordingSession.PoseInfo(
                 fileName: metadata.pose.file,
@@ -224,9 +245,6 @@ private extension RecordingSessionRepository {
                 url: poseURL,
                 fileSizeBytes: poseSize
             ) : nil
-
-        let incompleteMarkerURL = directoryURL.appendingPathComponent(RecordingSession.incompleteMarkerFilename)
-        let hasIncompleteMarker = fileManager.fileExists(atPath: incompleteMarkerURL.path)
 
         return RecordingSession(
             id: metadata.sessionId,

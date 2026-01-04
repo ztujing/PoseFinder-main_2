@@ -47,17 +47,9 @@ final class SessionDetailViewModel: ObservableObject {
                         return
                     }
                     print("[SessionDetailViewModel] reload succeeded for \(refreshed.id) at \(Date()) video:\(refreshed.video != nil) pose:\(refreshed.pose != nil)")
+                    let oldPoseURL = self.session.poseURL
                     self.session = refreshed
-                    self.errorMessage = nil
-                    if let videoURL = refreshed.videoURL {
-                        if let player = self.player {
-                            let item = AVPlayerItem(url: videoURL)
-                            player.replaceCurrentItem(with: item)
-                        } else {
-                            self.player = AVPlayer(url: videoURL)
-                        }
-                    }
-                    if self.session.poseURL != refreshed.poseURL {
+                    if oldPoseURL != refreshed.poseURL {
                         self.posePreview = nil
                     }
                     self.loadPosePreview(for: refreshed)
