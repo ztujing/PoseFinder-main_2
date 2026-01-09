@@ -1,0 +1,28 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Codex: exec + notify",
+      "type": "shell",
+      "command": "bash",
+      "args": [
+        "-lc",
+        "/Users/tujing/.nvm/versions/node/v20.19.4/bin/codex exec \"${input:prompt}\"; EC=$?; if [ $EC -eq 0 ]; then /usr/local/bin/terminal-notifier -title \"Codex\" -message \"完了\" -sound default -timeout 10; else /usr/local/bin/terminal-notifier -title \"Codex\" -message \"失敗 (exit $EC)\" -sound default -timeout 10; fi; exit $EC"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "prompt",
+      "type": "promptString",
+      "description": "Codexにやらせる内容",
+      "default": "変更点を反映してビルドエラーを直して"
+    }
+  ]
+}
