@@ -1,9 +1,19 @@
+// 目的: 撮影画面（UIKit）をSwiftUIに載せ、完了通知を親画面へ橋渡しする。
+// 入出力: 録画完了通知/中断通知と完了コールバック。
+// 依存: UIKit Storyboard, NotificationCenter, RecordingSessionRepository。
+// 副作用: 画面遷移、録画中断の通知送信。
+
+import Foundation
 import SwiftUI
 import UIKit
 
 extension Notification.Name {
     static let recordingSessionShouldCancel = Notification.Name("RecordingSessionShouldCancel")
     static let recordingSessionDidComplete = Notification.Name("RecordingSessionDidComplete")
+}
+
+enum RecordingSessionNotificationUserInfoKey {
+    static let directoryURL = "recordingSessionDirectoryURL"
 }
 
 struct RecordingSessionContainerView: UIViewControllerRepresentable {
@@ -27,6 +37,17 @@ struct RecordingSessionScreen: View {
     @Environment(\.dismiss) private var dismiss
     @State private var isShowingCancelAlert = false
     @State private var sessionCompleted = false
+    @State private var isHandlingCompletion = false
+    @State private var isShowingCompletionFailureAlert = false
+
+    private let repository = RecordingSessionRepository()
+    private let completionRetryDelay: TimeInterval = 0.25
+
+    let onCompleted: (RecordingSession) -> Void
+
+    init(onCompleted: @escaping (RecordingSession) -> Void = { _ in }) {
+        self.onCompleted = onCompleted
+    }
 
     var body: some View {
         RecordingSessionContainerView()
@@ -35,6 +56,7 @@ struct RecordingSessionScreen: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
+                        // 完了済みなら戻る、未完了なら中断確認を出す。
                         if sessionCompleted {
                             dismiss()
                         } else {
@@ -54,11 +76,61 @@ struct RecordingSessionScreen: View {
             } message: {
                 Text("中断した場合は保存されません。")
             }
+            .alert("保存は完了しました", isPresented: $isShowingCompletionFailureAlert) {
+                Button("OK") {
+                    dismiss()
+                }
+            } message: {
+                Text("履歴からセッションを確認してください。")
+            }
             .onAppear {
                 sessionCompleted = false
+                isHandlingCompletion = false
+                isShowingCompletionFailureAlert = false
             }
-            .onReceive(NotificationCenter.default.publisher(for: .recordingSessionDidComplete)) { _ in
+            .onReceive(NotificationCenter.default.publisher(for: .recordingSessionDidComplete)) { notification in
+                guard !isHandlingCompletion else { return }
+                isHandlingCompletion = true
                 sessionCompleted = true
+                handleRecordingCompleted(notification: notification)
             }
+    }
+
+    // --- Completion Handling ---
+
+    private func handleRecordingCompleted(notification: Notification) {
+        guard let directoryURL = notification.userInfo?[RecordingSessionNotificationUserInfoKey.directoryURL] as? URL else {
+            showCompletionFailureAlert()
+            return
+        }
+        loadCompletedSession(directoryURL: directoryURL, remainingRetries: 1)
+    }
+
+    private func loadCompletedSession(directoryURL: URL, remainingRetries: Int) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            let result = repository.reloadSession(at: directoryURL)
+            DispatchQueue.main.async {
+                switch result {
+                case .success(let session):
+                    dismiss()
+                    DispatchQueue.main.async {
+                        onCompleted(session)
+                    }
+                case .failure:
+                    // 1回だけ再試行し、失敗時は自動遷移を諦める。
+                    if remainingRetries > 0 {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + completionRetryDelay) {
+                            loadCompletedSession(directoryURL: directoryURL, remainingRetries: remainingRetries - 1)
+                        }
+                    } else {
+                        showCompletionFailureAlert()
+                    }
+                }
+            }
+        }
+    }
+
+    private func showCompletionFailureAlert() {
+        isShowingCompletionFailureAlert = true
     }
 }

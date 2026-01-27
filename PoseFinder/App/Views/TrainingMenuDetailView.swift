@@ -1,7 +1,14 @@
+// 目的: トレーニングメニュー詳細と撮影開始導線を提供し、完了後に詳細へ遷移する。
+// 入出力: 選択メニュー情報/撮影完了コールバック。
+// 依存: RecordingSessionScreen, SessionDetailView。
+// 副作用: 画面遷移（撮影→セッション詳細）。
+
 import SwiftUI
 
 struct TrainingMenuDetailView: View {
     @ObservedObject var viewModel: TrainingMenuDetailViewModel
+    @State private var completedSession: RecordingSession?
+    @State private var isShowingSessionDetail = false
 
     var body: some View {
         ScrollView {
@@ -12,6 +19,8 @@ struct TrainingMenuDetailView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 24)
+
+            sessionDetailLink
         }
         .navigationTitle(viewModel.menu.title)
         .navigationBarTitleDisplayMode(.inline)
@@ -51,7 +60,11 @@ struct TrainingMenuDetailView: View {
                 .font(.footnote)
                 .foregroundStyle(.secondary)
             NavigationLink {
-                RecordingSessionScreen()
+                RecordingSessionScreen { session in
+                    DispatchQueue.main.async {
+                        handleRecordingCompleted(session)
+                    }
+                }
                     .navigationTitle("撮影")
                     .navigationBarTitleDisplayMode(.inline)
             } label: {
@@ -63,5 +76,28 @@ struct TrainingMenuDetailView: View {
                     .foregroundStyle(.white)
             }
         }
+    }
+
+    private var sessionDetailLink: some View {
+        NavigationLink(destination: sessionDetailDestination, isActive: $isShowingSessionDetail) {
+            EmptyView()
+        }
+        .hidden()
+    }
+
+    @ViewBuilder
+    private var sessionDetailDestination: some View {
+        // セッション取得の有無に応じて遷移先を切り替える。
+        if let session = completedSession {
+            SessionDetailView(session: session)
+        } else {
+            EmptyView()
+        }
+    }
+
+    private func handleRecordingCompleted(_ session: RecordingSession) {
+        guard !isShowingSessionDetail else { return }
+        completedSession = session
+        isShowingSessionDetail = true
     }
 }
