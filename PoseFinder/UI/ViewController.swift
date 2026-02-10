@@ -6,6 +6,11 @@
  the user interface, video feed, and PoseNet model.
  */
 
+// 目的: 撮影画面の録画・Pose検出を管理し、セッション保存完了を通知する。
+// 入出力: カメラ入力/ユーザー操作/録画完了通知。
+// 依存: AVFoundation, MLKit, RecordingSessionManager, NotificationCenter。
+// 副作用: ファイル保存、通知送信、録画状態の更新。
+
 import AVFoundation
 import UIKit
 import VideoToolbox
@@ -286,12 +291,20 @@ class ViewController: UIViewController {
             DispatchQueue.main.async {
                 switch result {
                 case .success(let directoryURL):
+                    // 完了/中断の種別に応じて状態更新と通知を行う。
                     if markIncomplete {
                         self.recreateIncompleteMarker(at: directoryURL)
                         self.recordingState = .cancelled
                     } else {
                         self.recordingState = .completed
-                        NotificationCenter.default.post(name: .recordingSessionDidComplete, object: nil)
+                        let userInfo: [AnyHashable: Any] = [
+                            RecordingSessionNotificationUserInfoKey.directoryURL: directoryURL
+                        ]
+                        NotificationCenter.default.post(
+                            name: .recordingSessionDidComplete,
+                            object: nil,
+                            userInfo: userInfo
+                        )
                     }
                     print("Saved to: \(directoryURL.path)")
                 case .failure(let error):
