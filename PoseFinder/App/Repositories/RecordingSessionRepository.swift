@@ -1,3 +1,8 @@
+// 目的: セッションメタ/動画/Poseデータを読み込み、UI向けモデルへ変換する。
+// 入出力: Documents配下のセッションファイル読み込みと `RecordingSession` / `PoseFrame` 生成。
+// 依存: FileManager, JSONDecoder, PoseSerialization。
+// 副作用: ファイルI/O。
+
 import CoreGraphics
 import Foundation
 
@@ -54,11 +59,13 @@ struct RecordingSessionRepository {
             let newline = Data([0x0a])
             var buffer = Data()
 
+            // NDJSONをチャンクで読み込み、改行区切りでフレームを復元する。
             while true {
                 let chunk = handle.readData(ofLength: 4096)
                 if chunk.isEmpty, buffer.isEmpty { break }
                 buffer.append(chunk)
 
+                // 行単位で復元し、パースできるフレームのみ採用する。
                 while let range = buffer.firstRange(of: newline) {
                     let lineData = buffer.subdata(in: 0..<range.lowerBound)
                     buffer.removeSubrange(0..<range.upperBound)
@@ -80,6 +87,60 @@ struct RecordingSessionRepository {
             }
 
             throw RepositoryError.poseFrameNotFound
+        } catch {
+            return .failure(error)
+        }
+    }
+
+    func loadAllPoseFrames(from url: URL) -> Result<[PoseFrame], Error> {
+        do {
+            guard fileManager.fileExists(atPath: url.path) else {
+                throw RepositoryError.fileNotFound(url)
+            }
+
+            if let size = fileSize(at: url), size == 0 {
+                throw RepositoryError.emptyPoseFile
+            }
+
+            let handle = try FileHandle(forReadingFrom: url)
+            defer {
+                try? handle.close()
+            }
+
+            let newline = Data([0x0a])
+            var buffer = Data()
+            var frames: [PoseFrame] = []
+
+            while true {
+                let chunk = handle.readData(ofLength: 4096)
+                if chunk.isEmpty, buffer.isEmpty { break }
+                buffer.append(chunk)
+
+                while let range = buffer.firstRange(of: newline) {
+                    let lineData = buffer.subdata(in: 0..<range.lowerBound)
+                    buffer.removeSubrange(0..<range.upperBound)
+
+                    guard let cleaned = cleanedLineData(from: lineData), !cleaned.isEmpty else {
+                        continue
+                    }
+
+                    do {
+                        let frame = try decodePoseFrame(from: cleaned)
+                        frames.append(frame)
+                    } catch {
+                        // 無効行はスキップして継続
+                        continue
+                    }
+                }
+
+                if chunk.isEmpty { break }
+            }
+
+            if frames.isEmpty {
+                throw RepositoryError.poseFrameNotFound
+            }
+
+            return .success(frames.sorted(by: { $0.timestampMs < $1.timestampMs }))
         } catch {
             return .failure(error)
         }
@@ -274,13 +335,22 @@ private extension RecordingSessionRepository {
         let height = sizeArray.dropFirst().first ?? 0
         let imageSize = CGSize(width: width, height: height)
 
+        // 互換性対応:
+        // 旧データで座標が二重に正規化されている場合、値が極端に小さくなり左上に縮んで見える。
+        // jointsの最大値が十分小さい場合は二重正規化として補正する。
+        let maxX = payload.joints.values.map(\.x).max() ?? 0
+        let maxY = payload.joints.values.map(\.y).max() ?? 0
+        let isDoubleNormalized = width > 50 && height > 50 && maxX <= 0.02 && maxY <= 0.02
+        let scaleX = isDoubleNormalized ? (Double(width) * Double(width)) : Double(width)
+        let scaleY = isDoubleNormalized ? (Double(height) * Double(height)) : Double(height)
+
         var pose = Pose()
         for (key, jointPayload) in payload.joints {
             guard let jointName = JointNameMapper.jointName(for: key) else { continue }
             var joint = pose[jointName]
             joint.position = CGPoint(
-                x: CGFloat(jointPayload.x) * CGFloat(imageSize.width),
-                y: CGFloat(jointPayload.y) * CGFloat(imageSize.height)
+                x: CGFloat(jointPayload.x * scaleX),
+                y: CGFloat(jointPayload.y * scaleY)
             )
             joint.confidence = jointPayload.c
             joint.score = jointPayload.c
