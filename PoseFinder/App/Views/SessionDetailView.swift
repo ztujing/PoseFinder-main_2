@@ -1,3 +1,8 @@
+// 目的: セッション詳細で動画再生とPose情報を表示し、同期オーバーレイを提供する。
+// 入出力: `SessionDetailViewModel` の状態を表示する。
+// 依存: AVKit, SessionDetailViewModel, PosePreviewView。
+// 副作用: 再生の開始/停止、タイムオブザーバの制御。
+
 import AVKit
 import SwiftUI
 
@@ -40,12 +45,16 @@ struct SessionDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onDisappear {
             viewModel.player?.pause()
+            viewModel.stopTimeObserver()
         }
         .onAppear {
             print("SessionDetailView onAppear at \(Date())")
             viewModel.reloadSessionWithDelay()
+            viewModel.startTimeObserverIfNeeded()
         }
     }
+
+    // --- Sections ---
 
     @ViewBuilder
     private var videoSection: some View {
@@ -54,17 +63,31 @@ struct SessionDetailView: View {
                 .font(.title3)
                 .fontWeight(.semibold)
             
+            // 動画プレイヤと同期Poseを重ねて表示する。
             if let player = viewModel.player {
-                VideoPlayer(player: player)
-                    .frame(height: 240)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .clipped()
-                    .onAppear {
-                        if !isVideoPlaying {
-                            player.play()
-                            isVideoPlaying = true
+                GeometryReader { geometry in
+                    ZStack {
+                        VideoPlayer(player: player)
+                            .frame(width: geometry.size.width, height: geometry.size.height)
+                            .onAppear {
+                                if !isVideoPlaying {
+                                    player.play()
+                                    isVideoPlaying = true
+                                }
+                            }
+                        if let frame = viewModel.currentPoseFrame {
+                            PosePreviewView(
+                                poseFrame: frame,
+                                aspectRatioSize: viewModel.player?.currentItem?.presentationSize ?? viewModel.session.video?.size
+                            )
+                                .frame(width: geometry.size.width, height: geometry.size.height)
+                                .allowsHitTesting(false)
                         }
                     }
+                }
+                .frame(height: 240)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipped()
             } else {
                 Text("動画ファイルが見つかりません。")
                     .foregroundStyle(.secondary)
@@ -80,11 +103,18 @@ struct SessionDetailView: View {
                 .font(.title3)
                 .fontWeight(.semibold)
 
-            if let frame = viewModel.posePreview {
-                PosePreviewView(poseFrame: frame)
-                    .frame(height: 240)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .clipped()
+            // 同期フレームがあればそれを優先し、なければ静的プレビューを表示する。
+            if let frame = viewModel.currentPoseFrame ?? viewModel.posePreview {
+                GeometryReader { geometry in
+                    PosePreviewView(
+                        poseFrame: frame,
+                        aspectRatioSize: viewModel.player?.currentItem?.presentationSize ?? viewModel.session.video?.size
+                    )
+                        .frame(width: geometry.size.width, height: geometry.size.height)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .clipped()
+                }
+                .frame(height: 240)
             } else if let error = viewModel.errorMessage {
                 Text(error)
                     .foregroundStyle(.secondary)

@@ -63,13 +63,44 @@ enum PoseSerialization {
 
     private static func jointsDictionary(from pose: Pose, imageSize: CGSize) -> [String: JointPayload] {
         var result: [String: JointPayload] = [:]
+        let inputCoordinates = detectInputCoordinates(for: pose, imageSize: imageSize)
         for jointName in Joint.Name.allCases {
             let key = cocoKey(for: jointName)
             let joint = pose[jointName]
-            let normalized = normalize(joint.position, imageSize: imageSize)
+            let normalized: (x: Double, y: Double)
+            switch inputCoordinates {
+            case .normalized:
+                normalized = (x: clamp(Double(joint.position.x)), y: clamp(Double(joint.position.y)))
+            case .pixel:
+                normalized = normalize(joint.position, imageSize: imageSize)
+            }
             result[key] = JointPayload(x: normalized.x, y: normalized.y, c: max(0.0, min(1.0, joint.confidence)))
         }
         return result
+    }
+
+    private enum InputCoordinates {
+        case pixel
+        case normalized
+    }
+
+    private static func detectInputCoordinates(for pose: Pose, imageSize: CGSize) -> InputCoordinates {
+        // ML Kit由来の座標が「ピクセル」か「正規化済み」か、実データから推定して二重正規化を防ぐ。
+        // すべての関節が 0..1 付近に収まっている場合は正規化済みとみなす。
+        let positions = pose.joints.values
+            .filter { $0.isValid }
+            .map { $0.position }
+
+        guard !positions.isEmpty else { return .pixel }
+
+        let maxValue = positions
+            .flatMap { [abs($0.x), abs($0.y)] }
+            .max() ?? 0
+
+        // 画像サイズが極端に小さいケースは想定外のため pixel 扱いに倒す。
+        guard imageSize.width > 2, imageSize.height > 2 else { return .pixel }
+
+        return maxValue <= 1.5 ? .normalized : .pixel
     }
 
     private static func normalize(_ point: CGPoint, imageSize: CGSize) -> (x: Double, y: Double) {

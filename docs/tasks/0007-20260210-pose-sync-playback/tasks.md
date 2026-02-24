@@ -18,22 +18,22 @@
 
 ## 2. 実装タスク（Implementation Tasks）
 
-- [ ] 大タスク1: 生徒 Pose の全フレーム読み込みを追加する
-  - [ ] `RecordingSessionRepository` に `pose.ndjson` の全フレーム読み込み API を追加する
-  - [ ] `t_ms` 昇順のフレーム配列を作る（decode失敗行はスキップ）
+- [x] 大タスク1: 生徒 Pose の全フレーム読み込みを追加する
+  - [x] `RecordingSessionRepository` に `pose.ndjson` の全フレーム読み込み API を追加する
+  - [x] `t_ms` 昇順のフレーム配列を作る（decode失敗行はスキップ）
 
-- [ ] 大タスク2: セッション詳細 ViewModel に「現在フレーム」を導入する
-  - [ ] `SessionDetailViewModel` に `currentPoseFrame` を追加する
-  - [ ] `AVPlayer` の time observer を追加し、`currentTime` に応じてフレームを引き当てる
-  - [ ] observer の解除（`deinit` や `onDisappear` 相当）を確実に行う
+- [x] 大タスク2: セッション詳細 ViewModel に「現在フレーム」を導入する
+  - [x] `SessionDetailViewModel` に `currentPoseFrame` を追加する
+  - [x] `AVPlayer` の time observer を追加し、`currentTime` に応じてフレームを引き当てる
+  - [x] observer の解除（`deinit` や `onDisappear` 相当）を確実に行う
 
-- [ ] 大タスク3: `SessionDetail` にオーバーレイ表示を追加する
-  - [ ] 動画領域を `ZStack` にし、`PoseOverlayView` を重ねる
-  - [ ] `PosePreviewView` の描画ロジックを流用または切り出す
+- [x] 大タスク3: `SessionDetail` にオーバーレイ表示を追加する
+  - [x] 動画領域を `ZStack` にし、`PoseOverlayView` を重ねる
+  - [x] `PosePreviewView` の描画ロジックを流用または切り出す
 
-- [ ] 大タスク4: 例外系と表示を整える
-  - [ ] Pose が無いセッションでも動画表示は維持する
-  - [ ] NDJSON が空/不正の場合にクラッシュしないことを確認し、既存方針のエラー表示に合わせる
+- [x] 大タスク4: 例外系と表示を整える
+  - [x] Pose が無いセッションでも動画表示は維持する
+  - [x] NDJSON が空/不正の場合にクラッシュしないことを確認し、既存方針のエラー表示に合わせる
 
 - [ ] 大タスク5: `docs/specs` を最小更新する
   - [ ] `docs/specs/ui.md` に「再生時にPoseを同期表示する」を追記する
@@ -58,4 +58,3 @@
 - [ ] PR マージ
 - [ ] `impl-report.md` を `Done` に更新
 - [ ] フォローアップ Issue の登録（残課題があれば）
-

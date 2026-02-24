@@ -29,6 +29,12 @@ class PoseImageView: UIImageView {
         contentMode = .scaleAspectFit
         clipsToBounds = true
         backgroundColor = UIColor.clear
+
+        // SwiftUIレイアウトで横幅が潰れないように、伸縮優先度を下げる。
+        setContentHuggingPriority(.defaultLow, for: .horizontal)
+        setContentHuggingPriority(.defaultLow, for: .vertical)
+        setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        setContentCompressionResistancePriority(.defaultLow, for: .vertical)
     }
     
     // 教師と生徒の色を定義
