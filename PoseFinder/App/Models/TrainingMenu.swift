@@ -1,11 +1,12 @@
 import Foundation
 
-struct TrainingMenu: Identifiable, Hashable {
+struct TrainingMenu: Identifiable, Codable, Hashable {
     let id: String
     let title: String
     let description: String
     let focusPoints: [String]
     let estimatedDurationMinutes: Int?
+    let videoFileName: String?
 
     static let sampleData: [TrainingMenu] = [
         TrainingMenu(
@@ -17,7 +18,8 @@ struct TrainingMenu: Identifiable, Hashable {
                 "胸を張り背中を丸めない",
                 "かかとに体重を乗せる"
             ],
-            estimatedDurationMinutes: 5
+            estimatedDurationMinutes: 5,
+            videoFileName: "bg_blue.mp4"
         ),
         TrainingMenu(
             id: "deadlift",
@@ -28,7 +30,8 @@ struct TrainingMenu: Identifiable, Hashable {
                 "バーを体に近づけたまま引き上げる",
                 "肩をすくめず、肩甲骨を寄せる"
             ],
-            estimatedDurationMinutes: 4
+            estimatedDurationMinutes: 4,
+            videoFileName: "bg_blue.mp4"
         ),
         TrainingMenu(
             id: "pushup",
@@ -39,7 +42,8 @@ struct TrainingMenu: Identifiable, Hashable {
                 "肘は45度程度に開く",
                 "胸を床に近づけて十分に下ろす"
             ],
-            estimatedDurationMinutes: 3
+            estimatedDurationMinutes: 3,
+            videoFileName: "bg_blue.mp4"
         )
     ]
 }

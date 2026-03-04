@@ -4,15 +4,29 @@
 // 副作用: 画面遷移（撮影→セッション詳細）。
 
 import SwiftUI
+import AVKit
 
 struct TrainingMenuDetailView: View {
     @ObservedObject var viewModel: TrainingMenuDetailViewModel
     @State private var completedSession: RecordingSession?
     @State private var isShowingSessionDetail = false
+    @State private var player = AVPlayer()
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
+                if let videoURL = viewModel.videoURL() {
+                    VideoPlayer(player: player)
+                        .frame(height: 220)
+                        .cornerRadius(8)
+                        .onAppear {
+                            configureAndPlayVideo(from: videoURL)
+                        }
+                        .onDisappear {
+                            player.pause()
+                        }
+                        .padding(.bottom, 8)
+                }
                 headerSection
                 focusSection
                 navigationSection
@@ -99,5 +113,15 @@ struct TrainingMenuDetailView: View {
         guard !isShowingSessionDetail else { return }
         completedSession = session
         isShowingSessionDetail = true
+    }
+
+    private func configureAndPlayVideo(from url: URL) {
+        let currentURL = (player.currentItem?.asset as? AVURLAsset)?.url
+        if currentURL != url {
+            player.replaceCurrentItem(with: AVPlayerItem(url: url))
+        }
+
+        player.isMuted = true
+        player.play()
     }
 }

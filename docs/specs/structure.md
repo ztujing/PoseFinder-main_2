@@ -48,6 +48,34 @@ Pods/                       # CocoaPods（ML Kit）
   - 録画（`video.mp4`）と Pose（`pose.ndjson`）を同一セッションとして同期保存
   - 正常終了時のみ「未完了マーカー」を除去してセッションを確定
 
+---
+
+## 2.4 トレーニングメニュー構成
+
+メニュー情報の取得は Protocol/Repository パターンで抽象化されている。
+
+```
+HomeViewModel
+    ↓ (depends on)
+TrainingMenuRepository
+    ↓ (DI で切り替え可能)
+TrainingMenuDataSource (Protocol)
+    ├─ TrainingMenuLocalDataSource (バンドル/ドキュメント JSON)
+    └─ TrainingMenuRemoteDataSource (将来 REST API 等)
+```
+
+- 実装では `PoseFinder/App/DataSources/TrainingMenuDataSource.swift` がインターフェース定義
+- `PoseFinder/App/DataSources/TrainingMenuLocalDataSource.swift` がローカル JSON 読み込み
+- `PoseFinder/App/Repositories/TrainingMenuRepository.swift` でキャッシュ・エラーハンドリング
+- `PoseFinder/App/ViewModels/HomeViewModel.swift` は `TrainingMenuRepository` を `@StateObject` として保持
+- 詳細画面は `TrainingMenuDetailViewModel` が `videoURL()` で動画を提供
+
+ローカル設定ファイルは `Resources/training-menus.json` に格納され、
+アプリ初回起動時に `Documents/PoseFinderTrainingMenus/` にコピーされる。
+
+将来のリモート実装では `TrainingMenuRemoteDataSource` を追加し、
+`TrainingMenuRepository` の初期化時にデータソースを差し替えるだけで良い。
+
 ## 3. セッション保存仕様（ファイルベース）
 
 ### 3.1 保存先
