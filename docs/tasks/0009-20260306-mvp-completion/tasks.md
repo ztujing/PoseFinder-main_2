@@ -21,6 +21,7 @@
 - [x] 自動テスト追加
   - [x] PoseFinderTests に UI テストケース作成（撮影完了遷移）
   - [x] PoseFinderTests に UI テストケース作成（Pose 同期表示）
+  - [ ] 視覚確認依存のアサーションを `accessibilityIdentifier` ベースに置換
 
 - [x] specs 更新
   - [x] ui.md に Pose 同期オーバーレイ追記
@@ -32,20 +33,21 @@
 ## 3. テスト / 品質確認
 
 - [ ] テストコードの整備
-  - [ ] UI テスト実行
+  - [ ] UI テスト実行（`xcodebuild test`）
+  - [ ] 実行ログを `impl-report.md` に記録
 - [ ] 手動確認
   - [ ] 主要ユースケースの画面動作確認
 
 ## 4. ドキュメント / レビュー準備
 
-- [ ] `impl-report.md` のドラフト作成
-- [ ] `docs/specs/*` の更新（必要な場合）
+- [x] `impl-report.md` のドラフト作成
+- [x] `docs/specs/*` の更新（必要な場合）
 - [ ] レビュアーに共有（Issue / PR にリンク）
+- [ ] リリースノート更新
 
 ## 5. マージ / アフターケア
 
 - [ ] PR マージ
-- [ ] 本番/ステージングへのデプロイ確認
-- [ ] 監視 / アラート / ログの確認
+- [ ] `tasks.md` の未完チェックを解消
 - [ ] `impl-report.md` を `Done` に更新
 - [ ] フォローアップ Issue の登録（残課題があれば）

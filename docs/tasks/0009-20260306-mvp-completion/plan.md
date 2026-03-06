@@ -3,7 +3,7 @@
 - **Date**: 2026-03-06
 - **Owner**: @tujing
 - **Scope**: FE
-- **Status**: Draft
+- **Status**: Approved
 
 ## 1. 背景 / 目的（Context & Goals）
 
@@ -31,20 +31,26 @@
 ## 5. 実装方針（Design Overview）
 
 - テスト: PoseFinderTests に UI テスト追加（XCTest）。
+- 判定安定化: 主要画面要素に `accessibilityIdentifier` を付与し、視覚確認依存を減らす。
 - specs 更新: ui.md/tech.md に未反映内容を追記。
 - DoD: チェックリスト再実行。
 
 ## 6. 実装手順（Implementation Steps）
 
 1. 自動テスト追加: PoseFinderTests に UI テストケース作成（撮影完了遷移、Pose 同期表示）。
-2. specs 更新: ui.md に Pose 同期オーバーレイ追記、tech.md に座標系互換追記。
-3. DoD チェック: チェックリスト実行・確認。
+2. テスト安定化: `accessibilityIdentifier` 追加と UI テストの自動判定化。
+3. specs 更新: ui.md に Pose 同期オーバーレイ追記、tech.md に座標系互換追記。
+4. DoD チェック: チェックリスト実行・確認。
 
 ## 7. テスト計画 / 受入基準（Test Plan / Acceptance Criteria）
 
-- ユニット: UI テスト実行。
+- UI テスト:
+  - 対象: 撮影完了遷移、セッション詳細の同期オーバーレイ表示。
+  - 条件: `xcodebuild test` で対象テストが成功し、失敗時ログを記録する。
+- 手動確認:
+  - 対象: 撮影中断時に詳細画面へ遷移しないこと、履歴一覧から詳細表示できること。
 - DoD:
-  - [ ] 主要ユースケース自動化
+  - [ ] 主要ユースケース自動化（UI テストで再現可能な判定）
   - [ ] specs 更新
   - [ ] リリースノート更新
 
@@ -58,6 +64,7 @@
 
 - `docs/tasks/0009-20260306-mvp-completion/impl-report.md`
 - `docs/specs/ui.md` / `docs/specs/tech.md`
+- リリースノート（作成先を確定のうえ反映）
 
 ## 10. 参照（References）
 
