@@ -52,6 +52,11 @@
 
 実装: `PoseFinder/Utils/PoseSerialization.swift`
 
+- 再生時処理:
+  - 全フレーム読み込み後、`t_ms` 昇順整列。
+  - AVPlayer の現在時刻に最も近いフレームを二分探索で引き当て。
+  - 座標系互換: 正規化済み座標をピクセル座標に変換（points/pixels 不一致吸収）。
+
 ### 3.2 `session.json`
 
 - スキーマの基礎実装: `PoseFinder/Utils/RecordingSessionManager.swift`

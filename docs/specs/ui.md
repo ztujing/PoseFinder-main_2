@@ -81,7 +81,7 @@ graph TD
 - 実装: `PoseFinder/App/Views/SessionDetailView.swift`
 - 要素:
   - 動画再生（`VideoPlayer`）
-  - Pose プレビュー（`pose.ndjson` の先頭フレーム）
+  - Pose プレビュー（`pose.ndjson` の先頭フレーム + 再生時の同期オーバーレイ）
   - メタ情報（ファイル名、サイズ、デバイス/カメラ情報）
 
 ## 4. エラー/空状態の方針
