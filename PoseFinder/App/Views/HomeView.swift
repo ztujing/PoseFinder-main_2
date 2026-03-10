@@ -4,17 +4,20 @@ struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
 
     var body: some View {
-        List(viewModel.menus) { menu in
+        List(Array(viewModel.menus.enumerated()), id: \.element.id) { index, menu in
             NavigationLink(destination: TrainingMenuDetailView(viewModel: TrainingMenuDetailViewModel(menu: menu))) {
                 TrainingMenuRow(menu: menu)
             }
+            .accessibilityIdentifier("home.menu.row.\(index)")
         }
+        .accessibilityIdentifier("home.menu.list")
         .listStyle(.insetGrouped)
         .navigationTitle("トレーニングメニュー")
         .toolbar {
             NavigationLink(destination: SessionListView(viewModel: SessionListViewModel()).navigationTitle("セッション履歴")) {
                 Label("履歴", systemImage: "clock.arrow.circlepath")
             }
+            .accessibilityIdentifier("home.history.button")
         }
     }
 }

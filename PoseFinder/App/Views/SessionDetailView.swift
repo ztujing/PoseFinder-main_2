@@ -39,6 +39,7 @@ struct SessionDetailView: View {
             .padding(.horizontal, 16)
             .padding(.bottom, 32)
         }
+        .accessibilityIdentifier("session.detail.root")
         .navigationTitle("セッション詳細")
         
         
@@ -69,6 +70,7 @@ struct SessionDetailView: View {
                     ZStack {
                         VideoPlayer(player: player)
                             .frame(width: geometry.size.width, height: geometry.size.height)
+                            .accessibilityIdentifier("session.detail.videoPlayer")
                             .onAppear {
                                 if !isVideoPlaying {
                                     player.play()
@@ -82,6 +84,7 @@ struct SessionDetailView: View {
                             )
                                 .frame(width: geometry.size.width, height: geometry.size.height)
                                 .allowsHitTesting(false)
+                                .accessibilityIdentifier("session.detail.syncedPoseOverlay")
                         }
                     }
                 }
@@ -113,6 +116,7 @@ struct SessionDetailView: View {
                         .frame(width: geometry.size.width, height: geometry.size.height)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .clipped()
+                        .accessibilityIdentifier("session.detail.posePreview")
                 }
                 .frame(height: 240)
             } else if let error = viewModel.errorMessage {

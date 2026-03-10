@@ -1,42 +1,57 @@
 import XCTest
 
 final class PoseFinderUITests: XCTestCase {
-    let app = XCUIApplication()
+    private var app: XCUIApplication!
 
     override func setUpWithError() throws {
         continueAfterFailure = false
-        app.launch()
+        app = XCUIApplication()
     }
 
     func testRecordingCompletionNavigation() throws {
-        // ホームからメニュー選択
-        let menuButton = app.buttons["メニュー選択"]
-        XCTAssertTrue(menuButton.exists)
-        menuButton.tap()
+        launchApp(with: [UITestArg.seedSession, UITestArg.autoCompleteRecording])
 
-        // 撮影開始
-        let recordButton = app.buttons["撮影を開始"]
-        XCTAssertTrue(recordButton.exists)
-        recordButton.tap()
+        let firstMenuRow = app.otherElements["home.menu.row.0"]
+        XCTAssertTrue(firstMenuRow.waitForExistence(timeout: 5))
+        firstMenuRow.tap()
 
-        // 撮影完了（シミュレート: 実際の撮影は手動）
-        // 完了後、SessionDetail へ遷移することを確認
-        let sessionDetail = app.otherElements["SessionDetail"]
-        XCTAssertTrue(sessionDetail.waitForExistence(timeout: 10))
+        let startRecordingButton = app.buttons["training.startRecording.button"]
+        XCTAssertTrue(startRecordingButton.waitForExistence(timeout: 5))
+        startRecordingButton.tap()
+
+        let sessionDetailRoot = app.otherElements["session.detail.root"]
+        XCTAssertTrue(sessionDetailRoot.waitForExistence(timeout: 10))
     }
 
     func testPoseSyncPlayback() throws {
-        // セッション一覧から選択
-        let sessionList = app.otherElements["SessionList"]
-        XCTAssertTrue(sessionList.exists)
-        let sessionCell = app.cells.firstMatch
-        sessionCell.tap()
+        launchApp(with: [UITestArg.seedSession])
 
-        // 動画再生と Pose オーバーレイ確認
-        let videoPlayer = app.otherElements["VideoPlayer"]
-        XCTAssertTrue(videoPlayer.exists)
+        let historyButton = app.buttons["home.history.button"]
+        XCTAssertTrue(historyButton.waitForExistence(timeout: 5))
+        historyButton.tap()
 
-        // 再生開始（シミュレート）
-        // Pose が同期表示されることを確認（視覚確認が必要）
+        let sessionList = app.otherElements["session.list.root"]
+        XCTAssertTrue(sessionList.waitForExistence(timeout: 5))
+
+        let seededSessionRow = app.otherElements["session.list.completeRow.\(UITestArg.seededSessionID)"]
+        XCTAssertTrue(seededSessionRow.waitForExistence(timeout: 5))
+        seededSessionRow.tap()
+
+        let sessionDetailRoot = app.otherElements["session.detail.root"]
+        XCTAssertTrue(sessionDetailRoot.waitForExistence(timeout: 10))
+
+        let posePreview = app.otherElements["session.detail.posePreview"]
+        XCTAssertTrue(posePreview.waitForExistence(timeout: 10))
     }
+
+    private func launchApp(with arguments: [String]) {
+        app.launchArguments = arguments
+        app.launch()
+    }
+}
+
+private enum UITestArg {
+    static let seedSession = "-UITestSeedSession"
+    static let autoCompleteRecording = "-UITestAutoCompleteRecording"
+    static let seededSessionID = "ui-test-session-001"
 }

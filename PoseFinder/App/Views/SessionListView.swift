@@ -18,12 +18,15 @@ struct SessionListView: View {
                 NavigationLink(destination: SessionDetailView(session: session)) {
                     sessionRowContent(for: session, showIncompleteMessage: false)
                 }
+                .accessibilityIdentifier("session.list.completeRow.\(session.id)")
             } else {
                 sessionRowContent(for: session, showIncompleteMessage: true)
                     .contentShape(Rectangle())
                     .allowsHitTesting(false)
+                    .accessibilityIdentifier("session.list.incompleteRow.\(session.id)")
             }
         }
+        .accessibilityIdentifier("session.list.root")
         .overlay(alignment: .center) {
             if viewModel.isLoading {
                 ProgressView("読み込み中…")

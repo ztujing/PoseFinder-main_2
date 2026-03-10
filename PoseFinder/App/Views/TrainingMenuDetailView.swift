@@ -89,6 +89,7 @@ struct TrainingMenuDetailView: View {
                     .background(Capsule().fill(Color.accentColor))
                     .foregroundStyle(.white)
             }
+            .accessibilityIdentifier("training.startRecording.button")
         }
     }
 
@@ -104,6 +105,7 @@ struct TrainingMenuDetailView: View {
         // セッション取得の有無に応じて遷移先を切り替える。
         if let session = completedSession {
             SessionDetailView(session: session)
+                .accessibilityIdentifier("training.completed.sessionDetail")
         } else {
             EmptyView()
         }

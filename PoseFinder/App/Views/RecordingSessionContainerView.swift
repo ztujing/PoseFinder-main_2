@@ -7,6 +7,30 @@ import Foundation
 import SwiftUI
 import UIKit
 
+enum UITestSupport {
+    static let seedSessionArgument = "-UITestSeedSession"
+    static let autoCompleteRecordingArgument = "-UITestAutoCompleteRecording"
+    static let seededSessionID = "ui-test-session-001"
+
+    static var shouldSeedSession: Bool {
+        CommandLine.arguments.contains(seedSessionArgument)
+    }
+
+    static var shouldAutoCompleteRecording: Bool {
+        CommandLine.arguments.contains(autoCompleteRecordingArgument)
+    }
+
+    static func seededSessionDirectoryURL(fileManager: FileManager = .default) -> URL? {
+        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+
+        return documentsURL
+            .appendingPathComponent("Sessions", isDirectory: true)
+            .appendingPathComponent(seededSessionID, isDirectory: true)
+    }
+}
+
 extension Notification.Name {
     static let recordingSessionShouldCancel = Notification.Name("RecordingSessionShouldCancel")
     static let recordingSessionDidComplete = Notification.Name("RecordingSessionDidComplete")
@@ -51,6 +75,7 @@ struct RecordingSessionScreen: View {
 
     var body: some View {
         RecordingSessionContainerView()
+            .accessibilityIdentifier("recording.screen.root")
             .ignoresSafeArea()
             .navigationBarBackButtonHidden(true)
             .toolbar {
@@ -87,6 +112,7 @@ struct RecordingSessionScreen: View {
                 sessionCompleted = false
                 isHandlingCompletion = false
                 isShowingCompletionFailureAlert = false
+                triggerUITestAutoCompletionIfNeeded()
             }
             .onReceive(NotificationCenter.default.publisher(for: .recordingSessionDidComplete)) { notification in
                 guard !isHandlingCompletion else { return }
@@ -132,5 +158,18 @@ struct RecordingSessionScreen: View {
 
     private func showCompletionFailureAlert() {
         isShowingCompletionFailureAlert = true
+    }
+
+    private func triggerUITestAutoCompletionIfNeeded() {
+        guard UITestSupport.shouldAutoCompleteRecording else { return }
+        guard let directoryURL = UITestSupport.seededSessionDirectoryURL() else { return }
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            NotificationCenter.default.post(
+                name: .recordingSessionDidComplete,
+                object: nil,
+                userInfo: [RecordingSessionNotificationUserInfoKey.directoryURL: directoryURL]
+            )
+        }
     }
 }
