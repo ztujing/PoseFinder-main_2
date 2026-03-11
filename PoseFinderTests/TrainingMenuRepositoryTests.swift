@@ -35,6 +35,11 @@ final class TrainingMenuRepositoryTests: XCTestCase {
         mock.shouldThrow = true
         let repo = TrainingMenuRepository(dataSource: mock)
 
-        await XCTAssertThrowsError(try await repo.getTrainingMenus())
+        do {
+            _ = try await repo.getTrainingMenus()
+            XCTFail("Expected getTrainingMenus to throw")
+        } catch {
+            XCTAssertNotNil(error)
+        }
     }
 }

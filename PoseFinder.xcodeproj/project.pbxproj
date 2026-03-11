@@ -39,6 +39,7 @@
 		4AE8C3D123AD2D3B005F9953 /* PoseNetInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C3D023AD2D3B005F9953 /* PoseNetInput.swift */; };
 		4AE8C3D323AD2D8A005F9953 /* PoseNetOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C3D223AD2D8A005F9953 /* PoseNetOutput.swift */; };
 		4CAE58F0CB9F5537175E0C52 /* Pods_PoseFinder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */; };
+		A44C5E8F8FE74C919E8E4D1B /* Pods_PoseFinder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */; };
 		6A66239D8C984F1A8BEDA31960952EB2 /* TrainingMenuDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2C1D871D9E848BF8FE2CBF0ACE18169 /* TrainingMenuDetailView.swift */; };
 		6D12FCF22C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 6D12FCF12C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel */; };
 		6D1B1CC328CD64900013B0E1 /* PoseFinder/UI/PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D1B1CC228CD64900013B0E1 /* PoseFinder/UI/PlayerView.swift */; };
@@ -151,6 +152,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A44C5E8F8FE74C919E8E4D1B /* Pods_PoseFinder.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -784,6 +786,7 @@
 		};
 		6D597D6B2F5F07E7007332E0 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E141FCF9BCE9A5F93433101C /* Pods-PoseFinder.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -812,6 +815,7 @@
 		};
 		6D597D6C2F5F07E7007332E0 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 45926716BFFD2EB28BE81815 /* Pods-PoseFinder.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";

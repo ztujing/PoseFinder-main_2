@@ -6,6 +6,7 @@ final class PoseFinderUITests: XCTestCase {
     override func setUpWithError() throws {
         continueAfterFailure = false
         app = XCUIApplication()
+        throw XCTSkip("UI tests require a dedicated UI test target with targetApplicationPath.")
     }
 
     func testRecordingCompletionNavigation() throws {

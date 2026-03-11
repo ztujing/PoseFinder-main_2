@@ -11,4 +11,8 @@ target 'PoseFinder' do
 
   pod 'GoogleMLKit/PoseDetection', '3.2.0'
 
+  target 'PoseFinderTests' do
+    inherit! :search_paths
+  end
+
 end
