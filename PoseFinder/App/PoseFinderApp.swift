@@ -18,19 +18,38 @@ struct PoseFinderApp: App {
 
 private struct RootNavigationView: View {
     @StateObject private var homeViewModel = HomeViewModel()
+    private let uiTestMenu = TrainingMenu(
+        id: "ui-test-training-menu-001",
+        title: "UI Test Training",
+        description: "UIテスト用の一時メニューです。",
+        focusPoints: ["フォームを安定させる"],
+        estimatedDurationMinutes: 1,
+        videoFileName: nil
+    )
 
     var body: some View {
         Group {
             if #available(iOS 16.0, *) {
                 NavigationStack {
-                    HomeView(viewModel: homeViewModel)
+                    rootContent
                 }
             } else {
                 NavigationView {
-                    HomeView(viewModel: homeViewModel)
+                    rootContent
                 }
                 .navigationViewStyle(.stack)
             }
+        }
+    }
+
+    @ViewBuilder
+    private var rootContent: some View {
+        if UITestSupport.shouldOpenSessionList {
+            SessionListView(viewModel: SessionListViewModel())
+        } else if UITestSupport.shouldOpenTrainingDetail {
+            TrainingMenuDetailView(viewModel: TrainingMenuDetailViewModel(menu: uiTestMenu))
+        } else {
+            HomeView(viewModel: homeViewModel)
         }
     }
 }

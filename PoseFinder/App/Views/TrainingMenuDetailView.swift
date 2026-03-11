@@ -33,9 +33,10 @@ struct TrainingMenuDetailView: View {
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 24)
-
-            sessionDetailLink
         }
+        .background(
+            sessionDetailLink
+        )
         .navigationTitle(viewModel.menu.title)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -105,7 +106,6 @@ struct TrainingMenuDetailView: View {
         // セッション取得の有無に応じて遷移先を切り替える。
         if let session = completedSession {
             SessionDetailView(session: session)
-                .accessibilityIdentifier("training.completed.sessionDetail")
         } else {
             EmptyView()
         }

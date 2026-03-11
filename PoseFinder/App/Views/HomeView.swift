@@ -2,6 +2,7 @@ import SwiftUI
 
 struct HomeView: View {
     @ObservedObject var viewModel: HomeViewModel
+    @State private var isShowingHistory = false
 
     var body: some View {
         List(Array(viewModel.menus.enumerated()), id: \.element.id) { index, menu in
@@ -14,11 +15,22 @@ struct HomeView: View {
         .listStyle(.insetGrouped)
         .navigationTitle("トレーニングメニュー")
         .toolbar {
-            NavigationLink(destination: SessionListView(viewModel: SessionListViewModel()).navigationTitle("セッション履歴")) {
+            Button {
+                isShowingHistory = true
+            } label: {
                 Label("履歴", systemImage: "clock.arrow.circlepath")
             }
             .accessibilityIdentifier("home.history.button")
         }
+        .background(
+            NavigationLink(
+                destination: SessionListView(viewModel: SessionListViewModel()).navigationTitle("セッション履歴"),
+                isActive: $isShowingHistory
+            ) {
+                EmptyView()
+            }
+            .hidden()
+        )
     }
 }
 

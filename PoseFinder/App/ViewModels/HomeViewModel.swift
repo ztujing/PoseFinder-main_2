@@ -10,10 +10,26 @@ final class HomeViewModel: ObservableObject {
 
     init(repository: TrainingMenuRepository = TrainingMenuRepository()) {
         self.repository = repository
+        seedMenusForUITestIfNeeded()
         loadMenus()
     }
 
     // MARK: - Private Methods
+
+    private func seedMenusForUITestIfNeeded() {
+        guard UITestSupport.shouldSeedSession else { return }
+
+        menus = [
+            TrainingMenu(
+                id: "ui-test-training-menu-001",
+                title: "UI Test Training",
+                description: "UIテスト用の一時メニューです。",
+                focusPoints: ["フォームを安定させる"],
+                estimatedDurationMinutes: 1,
+                videoFileName: nil
+            )
+        ]
+    }
 
     private func loadMenus() {
         isLoading = true

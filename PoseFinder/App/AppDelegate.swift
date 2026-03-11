@@ -101,6 +101,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
         let poseNDJSON = """
         {"t_ms":0,"img_size":[1280,720],"score":0.98,"joints":{"nose":{"x":0.50,"y":0.30,"c":0.98},"leftShoulder":{"x":0.43,"y":0.42,"c":0.95},"rightShoulder":{"x":0.57,"y":0.42,"c":0.96},"leftHip":{"x":0.46,"y":0.58,"c":0.92},"rightHip":{"x":0.54,"y":0.58,"c":0.93}}}
+
         """
 
         guard let metadataData = metadataJSON.data(using: .utf8),

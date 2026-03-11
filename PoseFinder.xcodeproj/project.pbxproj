@@ -39,7 +39,6 @@
 		4AE8C3D123AD2D3B005F9953 /* PoseNetInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C3D023AD2D3B005F9953 /* PoseNetInput.swift */; };
 		4AE8C3D323AD2D8A005F9953 /* PoseNetOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AE8C3D223AD2D8A005F9953 /* PoseNetOutput.swift */; };
 		4CAE58F0CB9F5537175E0C52 /* Pods_PoseFinder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */; };
-		A44C5E8F8FE74C919E8E4D1B /* Pods_PoseFinder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */; };
 		6A66239D8C984F1A8BEDA31960952EB2 /* TrainingMenuDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2C1D871D9E848BF8FE2CBF0ACE18169 /* TrainingMenuDetailView.swift */; };
 		6D12FCF22C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 6D12FCF12C04BAD7007F7CD3 /* PoseNetMobileNet100S8FP16.mlmodel */; };
 		6D1B1CC328CD64900013B0E1 /* PoseFinder/UI/PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D1B1CC228CD64900013B0E1 /* PoseFinder/UI/PlayerView.swift */; };
@@ -51,6 +50,7 @@
 		6DF0B1032E00AA1100AA0001 /* RecordingSessionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0B1022E00AA1100AA0001 /* RecordingSessionManager.swift */; };
 		6DF0B1052E00AA1100AA0001 /* PoseFinderApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DF0B1042E00AA1100AA0001 /* PoseFinderApp.swift */; };
 		7E1E1A8AAD5A45D996F2A8D4A95567AC /* SessionDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD153A9BBAFA400E9A62E3B224F1F838 /* SessionDetailView.swift */; };
+		A44C5E8F8FE74C919E8E4D1B /* Pods_PoseFinder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F542372BE2B310E044948BE7 /* Pods_PoseFinder.framework */; };
 		AA11BB22CC33DD44EE55FF66 /* Resources/training-menus.json in Resources */ = {isa = PBXBuildFile; fileRef = AA11BB22CC33DD44EE55FF67 /* Resources/training-menus.json */; };
 		B3C4D5556EFF44BB92F34567FEDCBA21 /* TrainingMenuRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2E2F3334FDD44AA93F34567ABCDEF12 /* TrainingMenuRepository.swift */; };
 		C1C2C3C4C5C6C7C8C9C0C1C2C3C4C5C6 /* TrainingMenuDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A2A3A4A5A6A7A8A9A0A1A2A3A4A5A6 /* TrainingMenuDataSource.swift */; };
@@ -63,6 +63,13 @@
 
 /* Begin PBXContainerItemProxy section */
 		6D597D692F5F07E7007332E0 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 4A2D23A622BB70E400494C55 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 4A2D23AD22BB70E400494C55;
+			remoteInfo = PoseFinder;
+		};
+		7A11B2C32D4E5F60718293AB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 4A2D23A622BB70E400494C55 /* Project object */;
 			proxyType = 1;
@@ -107,6 +114,7 @@
 		6D1B1CC228CD64900013B0E1 /* PoseFinder/UI/PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseFinder/UI/PlayerView.swift; sourceTree = "<group>"; };
 		6D447E0C2D92D3C400CE1449 /* PoseBuilderV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoseBuilderV2.swift; sourceTree = "<group>"; };
 		6D597D652F5F07E7007332E0 /* PoseFinderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PoseFinderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A11B2C32D4E5F60718293A4 /* PoseFinderUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PoseFinderUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6D820018287A45FD00483910 /* traning.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; name = traning.mp4; path = "../../iOS14-Resources-master/SwiftUIVideoPlayerCoreImage/SwiftUIVideoPlayerCoreImage/traning.mp4"; sourceTree = "<group>"; };
 		6D820019287A463A00483910 /* traning.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = traning.mp4; sourceTree = "<group>"; };
 		6DD239412A5D93D90007D39A /* ScaledPoseHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScaledPoseHelper.swift; sourceTree = "<group>"; };
@@ -137,6 +145,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6D597D662F5F07E7007332E0 /* PoseFinderTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PoseFinderTests; sourceTree = "<group>"; };
+		7A11B2C32D4E5F60718293A5 /* PoseFinderUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = PoseFinderUITests; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +162,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A44C5E8F8FE74C919E8E4D1B /* Pods_PoseFinder.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A11B2C32D4E5F60718293A7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,6 +217,7 @@
 				AA11BB22CC33DD44EE55FF67 /* Resources/training-menus.json */,
 				4A2D23B022BB70E400494C55 /* PoseFinder */,
 				6D597D662F5F07E7007332E0 /* PoseFinderTests */,
+				7A11B2C32D4E5F60718293A5 /* PoseFinderUITests */,
 				4A2D23AF22BB70E400494C55 /* Products */,
 				1E2F76EA3781C8213469E3A0 /* Configuration */,
 				0D8A71B927BDB43FD8F91908 /* LICENSE */,
@@ -215,6 +232,7 @@
 			children = (
 				4A2D23AE22BB70E400494C55 /* PoseFinder.app */,
 				6D597D652F5F07E7007332E0 /* PoseFinderTests.xctest */,
+				7A11B2C32D4E5F60718293A4 /* PoseFinderUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -409,6 +427,29 @@
 			productReference = 6D597D652F5F07E7007332E0 /* PoseFinderTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		7A11B2C32D4E5F60718293A9 /* PoseFinderUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A11B2C32D4E5F60718293AE /* Build configuration list for PBXNativeTarget "PoseFinderUITests" */;
+			buildPhases = (
+				7A11B2C32D4E5F60718293A6 /* Sources */,
+				7A11B2C32D4E5F60718293A7 /* Frameworks */,
+				7A11B2C32D4E5F60718293A8 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7A11B2C32D4E5F60718293AA /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7A11B2C32D4E5F60718293A5 /* PoseFinderUITests */,
+			);
+			name = PoseFinderUITests;
+			packageProductDependencies = (
+			);
+			productName = PoseFinderUITests;
+			productReference = 7A11B2C32D4E5F60718293A4 /* PoseFinderUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -423,6 +464,10 @@
 						CreatedOnToolsVersion = 11.0;
 					};
 					6D597D642F5F07E7007332E0 = {
+						CreatedOnToolsVersion = 26.3;
+						TestTargetID = 4A2D23AD22BB70E400494C55;
+					};
+					7A11B2C32D4E5F60718293A9 = {
 						CreatedOnToolsVersion = 26.3;
 						TestTargetID = 4A2D23AD22BB70E400494C55;
 					};
@@ -443,6 +488,7 @@
 			targets = (
 				4A2D23AD22BB70E400494C55 /* PoseFinder */,
 				6D597D642F5F07E7007332E0 /* PoseFinderTests */,
+				7A11B2C32D4E5F60718293A9 /* PoseFinderUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -462,6 +508,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		6D597D632F5F07E7007332E0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A11B2C32D4E5F60718293A8 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -596,6 +649,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7A11B2C32D4E5F60718293A6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -603,6 +663,11 @@
 			isa = PBXTargetDependency;
 			target = 4A2D23AD22BB70E400494C55 /* PoseFinder */;
 			targetProxy = 6D597D692F5F07E7007332E0 /* PBXContainerItemProxy */;
+		};
+		7A11B2C32D4E5F60718293AA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 4A2D23AD22BB70E400494C55 /* PoseFinder */;
+			targetProxy = 7A11B2C32D4E5F60718293AB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -841,6 +906,44 @@
 			};
 			name = Release;
 		};
+		7A11B2C32D4E5F60718293AC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NSF784A69G;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hotmail.tujing-.apple-samplecode.posefinder.PoseFinderUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PoseFinder;
+			};
+			name = Debug;
+		};
+		7A11B2C32D4E5F60718293AD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = NSF784A69G;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.hotmail.tujing-.apple-samplecode.posefinder.PoseFinderUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = PoseFinder;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -867,6 +970,15 @@
 			buildConfigurations = (
 				6D597D6B2F5F07E7007332E0 /* Debug */,
 				6D597D6C2F5F07E7007332E0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7A11B2C32D4E5F60718293AE /* Build configuration list for PBXNativeTarget "PoseFinderUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A11B2C32D4E5F60718293AC /* Debug */,
+				7A11B2C32D4E5F60718293AD /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

@@ -10,6 +10,8 @@ import UIKit
 enum UITestSupport {
     static let seedSessionArgument = "-UITestSeedSession"
     static let autoCompleteRecordingArgument = "-UITestAutoCompleteRecording"
+    static let openSessionListArgument = "-UITestOpenSessionList"
+    static let openTrainingDetailArgument = "-UITestOpenTrainingDetail"
     static let seededSessionID = "ui-test-session-001"
 
     static var shouldSeedSession: Bool {
@@ -18,6 +20,14 @@ enum UITestSupport {
 
     static var shouldAutoCompleteRecording: Bool {
         CommandLine.arguments.contains(autoCompleteRecordingArgument)
+    }
+
+    static var shouldOpenSessionList: Bool {
+        CommandLine.arguments.contains(openSessionListArgument)
+    }
+
+    static var shouldOpenTrainingDetail: Bool {
+        CommandLine.arguments.contains(openTrainingDetailArgument)
     }
 
     static func seededSessionDirectoryURL(fileManager: FileManager = .default) -> URL? {

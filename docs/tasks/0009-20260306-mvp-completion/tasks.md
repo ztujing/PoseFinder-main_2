@@ -32,8 +32,8 @@
 
 ## 3. テスト / 品質確認
 
-- [ ] テストコードの整備
-  - [x] UI テスト実行（`xcodebuild test`、UI 2件は skip）
+- [x] テストコードの整備
+  - [x] UI テスト実行（`xcodebuild test`）
   - [x] 実行ログを `impl-report.md` に記録
 - [ ] 手動確認
   - [ ] 主要ユースケースの画面動作確認
