@@ -4,7 +4,7 @@
 - **Owner**: @tujing
 - **Related PLAN**: [PLAN-0009](docs/tasks/0009-20260306-mvp-completion/plan.md)
 - **Scope**: FE
-- **Status**: In Progress
+- **Status**: Done
 
 > 本ファイルは `plan.md` の「実装手順（Implementation Steps）」を  
 > 実際の作業単位に分解した **2階層のチェックリスト** です。  
@@ -42,12 +42,12 @@
 
 - [x] `impl-report.md` のドラフト作成
 - [x] `docs/specs/*` の更新（必要な場合）
-- [ ] レビュアーに共有（Issue / PR にリンク）
-- [ ] リリースノート更新
+- [x] 実施経路を記録（PR なし / direct merge）
+- [x] リリースノート更新
 
 ## 5. マージ / アフターケア
 
-- [ ] PR マージ
-- [ ] `tasks.md` の未完チェックを解消
-- [ ] `impl-report.md` を `Done` に更新
-- [ ] フォローアップ Issue の登録（残課題があれば）
+- [x] `main` へ fast-forward マージ
+- [x] `tasks.md` の未完チェックを解消
+- [x] `impl-report.md` を `Done` に更新
+- [x] フォローアップ Issue の登録要否を確認（今回は起票なし）

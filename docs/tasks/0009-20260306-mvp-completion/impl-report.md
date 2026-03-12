@@ -1,14 +1,14 @@
-                                            # IMPL-0009: 未完項目完了（MVP 完全化ステップ1）
+# IMPL-0009: 未完項目完了（MVP 完全化ステップ1）
 
 - **Date**: 2026-03-09
 - **Owner**: @tujing
 - **Related PLAN**: [PLAN-0009](docs/tasks/0009-20260306-mvp-completion/plan.md)
-- **PRs**: -
-- **Status**: Partially Done
+- **PRs**: なし（`main` へ fast-forward マージ）
+- **Status**: Done
 
 ## 1. 実装サマリ（What Changed）
 
-- UI テスト追加: PoseFinderTests/PoseFinderUITests.swift に撮影完了遷移と Pose 同期表示のテストケースを追加。
+- UI テスト追加: `PoseFinderTests` / `PoseFinderUITests` に撮影完了遷移と Pose 同期表示のテストケースを追加。
 - UI テスト安定化: 起動引数で UI テスト用セッションを自動投入し、`accessibilityIdentifier` ベースで判定可能にした。
 - テスト基盤整備: `PoseFinderTests` ターゲットを追加し、`PoseFinder.xcscheme` の `TestAction` に `PoseFinderTests` を接続した。
 - テスト設定整備: `PoseFinderTests` の `TEST_HOST` / `BUNDLE_LOADER` を確認し、デプロイターゲットを `15.6` に揃えた。
@@ -18,7 +18,7 @@
 - UI テスト安定化: `CollectionView/Button` に合わせたクエリへ修正し、遷移導線と UI テストシード（pose.ndjson 末尾改行）を調整して 2 件を Green 化。
 - specs 更新: ui.md に Pose 同期オーバーレイ追記、tech.md に座標系互換追記。
 - DoD チェック: 0006/0007 のチェックリスト再実行・確認。
-- 未完: リリースノート更新。
+- リリースノート: `docs/release-notes.md` を新設し、0009 の反映内容を追記。
 
 ## 2. 仕様の確定内容（Finalized Specs）
 
@@ -29,6 +29,8 @@
 
 - テストターゲット/スキーム設定を追加したため、旧エラー（`Scheme PoseFinder is not currently configured for the test action.`）は解消した。
 - `xcodebuild` は専用 `DerivedData` を使用して再実行する運用に変更した。
+- リリースノートの格納先が未定だったため、共有ファイル `docs/release-notes.md` を新設した。
+- PR 経由ではなく `main` へ fast-forward マージして完了した。
 
 ## 4. テスト結果（Evidence）
 
@@ -65,7 +67,7 @@
 - DoD:
   - [x] 主要ユースケース自動化（UI テスト2件 Green）
   - [x] specs 更新
-  - [ ] リリースノート更新（次タスク）
+  - [x] リリースノート更新
 
 ## 5. 運用ノート（Operational Notes）
 
@@ -74,10 +76,13 @@
 
 ## 6. 既知の課題 / 次の改善（Known Issues / Follow-ups）
 
-- リリースノート更新。
+- 長尺/高fpsセッション向けの Pose フレーム読み込み最適化。
+- 計測（fps/latency/電力/温度）と OSLog 整備。
 
 ## 7. 関連ドキュメント（Links）
 
 - 0006/0007 impl-report
 
 ## 8. 追記/正誤
+
+- 2026-03-12: `docs/release-notes.md` を追加し、`Status` を `Done` へ更新。
