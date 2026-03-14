@@ -15,7 +15,12 @@ final class SessionDetailViewModel: ObservableObject {
     @Published var isReloading: Bool = false
 
     private let repository: RecordingSessionRepository
-    private var poseFrames: [PoseFrame] = []
+    private let poseLoadQueue = DispatchQueue(label: "SessionDetailViewModel.poseLoadQueue", qos: .userInitiated)
+    private var poseFrameIndex: RecordingSessionRepository.PoseFrameIndex?
+    private var poseFrameCache: [Int: PoseFrame] = [:]
+    private var poseFrameCacheOrder: [Int] = []
+    private var poseLoadGeneration: Int = 0
+    private var requestedPoseFrameIndex: Int?
     private var timeObserverToken: Any?
 
     init(session: RecordingSession, repository: RecordingSessionRepository = RecordingSessionRepository()) {
@@ -83,20 +88,26 @@ final class SessionDetailViewModel: ObservableObject {
         }
         print("[SessionDetailViewModel] pose frames load started for \(session.id) at \(Date())")
         DispatchQueue.global(qos: .userInitiated).async {
-            let result = self.repository.loadAllPoseFrames(from: poseURL)
+            let result = self.repository.loadPoseFrameIndex(from: poseURL)
             DispatchQueue.main.async {
                 switch result {
-                case .success(let frames):
-                    self.poseFrames = frames
-                    self.posePreview = frames.first
+                case .success(let index):
+                    self.poseLoadGeneration += 1
+                    self.poseFrameIndex = index
+                    self.poseFrameCache.removeAll()
+                    self.poseFrameCacheOrder.removeAll()
+                    self.requestedPoseFrameIndex = nil
+                    self.posePreview = self.loadPoseFrameSynchronously(from: index, at: 0)
                     self.updateCurrentPoseFrame(at: self.player?.currentTime() ?? .zero)
                     self.startTimeObserverIfNeeded()
-                    print("[SessionDetailViewModel] pose frames load succeeded for \(session.id) at \(Date()) count=\(frames.count)")
+                    print("[SessionDetailViewModel] pose frame index load succeeded for \(session.id) at \(Date()) count=\(index.count)")
                 case .failure(let error):
                     self.errorMessage = error.localizedDescription
-                    self.poseFrames = []
+                    self.poseFrameIndex = nil
+                    self.poseFrameCache.removeAll()
+                    self.poseFrameCacheOrder.removeAll()
                     self.currentPoseFrame = nil
-                    print("[SessionDetailViewModel] pose frames load failed for \(session.id): \(error.localizedDescription)")
+                    print("[SessionDetailViewModel] pose frame index load failed for \(session.id): \(error.localizedDescription)")
                 }
             }
         }
@@ -106,7 +117,7 @@ final class SessionDetailViewModel: ObservableObject {
 
     func startTimeObserverIfNeeded() {
         guard timeObserverToken == nil else { return }
-        guard let player = player, !poseFrames.isEmpty else { return }
+        guard let player = player, let index = poseFrameIndex, index.count > 0 else { return }
 
         let interval = CMTime(seconds: 1.0 / 30.0, preferredTimescale: 600)
         timeObserverToken = player.addPeriodicTimeObserver(forInterval: interval, queue: .main) { [weak self] time in
@@ -121,40 +132,92 @@ final class SessionDetailViewModel: ObservableObject {
     }
 
     private func updateCurrentPoseFrame(at time: CMTime) {
-        guard !poseFrames.isEmpty else {
+        guard let index = poseFrameIndex else {
             currentPoseFrame = nil
             return
         }
         let currentMs = Int((CMTimeGetSeconds(time) * 1000.0).rounded())
-        if let index = closestPoseFrameIndex(for: currentMs) {
-            currentPoseFrame = poseFrames[index]
+        guard let poseIndex = index.closestFrameIndex(for: currentMs) else {
+            currentPoseFrame = nil
+            return
+        }
+        if let cached = poseFrameCache[poseIndex] {
+            currentPoseFrame = cached
+            preloadPoseFramesIfNeeded(around: poseIndex)
+            return
+        }
+
+        guard requestedPoseFrameIndex != poseIndex else { return }
+        requestedPoseFrameIndex = poseIndex
+        let generation = poseLoadGeneration
+        let activeIndex = index
+
+        poseLoadQueue.async { [weak self] in
+            guard let self else { return }
+            let result = self.repository.loadPoseFrame(from: activeIndex, at: poseIndex)
+            DispatchQueue.main.async {
+                guard generation == self.poseLoadGeneration else { return }
+                guard self.requestedPoseFrameIndex == poseIndex else { return }
+                self.requestedPoseFrameIndex = nil
+                if case .success(let frame) = result {
+                    self.cachePoseFrame(frame, at: poseIndex)
+                    self.currentPoseFrame = frame
+                    self.preloadPoseFramesIfNeeded(around: poseIndex)
+                }
+            }
         }
     }
 
-    private func closestPoseFrameIndex(for timestampMs: Int) -> Int? {
-        guard !poseFrames.isEmpty else { return nil }
-        if timestampMs <= poseFrames[0].timestampMs { return 0 }
-        if timestampMs >= poseFrames[poseFrames.count - 1].timestampMs { return poseFrames.count - 1 }
+    private func preloadPoseFramesIfNeeded(around centerIndex: Int) {
+        guard let index = poseFrameIndex else { return }
+        let candidates = [centerIndex - 2, centerIndex - 1, centerIndex + 1, centerIndex + 2]
+            .filter { $0 >= 0 && $0 < index.count && poseFrameCache[$0] == nil }
+        guard !candidates.isEmpty else { return }
+        let generation = poseLoadGeneration
+        let activeIndex = index
 
-        var low = 0
-        var high = poseFrames.count - 1
-        // 二分探索で最も近いフレーム候補を特定する。
-        while low <= high {
-            let mid = (low + high) / 2
-            let midTs = poseFrames[mid].timestampMs
-            if midTs == timestampMs {
-                return mid
-            } else if midTs < timestampMs {
-                low = mid + 1
-            } else {
-                high = mid - 1
+        poseLoadQueue.async { [weak self] in
+            guard let self else { return }
+            let loaded: [(Int, PoseFrame)] = candidates.compactMap { candidate in
+                let result = self.repository.loadPoseFrame(from: activeIndex, at: candidate)
+                if case .success(let frame) = result {
+                    return (candidate, frame)
+                }
+                return nil
+            }
+
+            guard !loaded.isEmpty else { return }
+            DispatchQueue.main.async {
+                guard generation == self.poseLoadGeneration else { return }
+                for (candidate, frame) in loaded where self.poseFrameCache[candidate] == nil {
+                    self.cachePoseFrame(frame, at: candidate)
+                }
             }
         }
+    }
 
-        let lowerIndex = max(high, 0)
-        let upperIndex = min(low, poseFrames.count - 1)
-        let lowerDelta = abs(poseFrames[lowerIndex].timestampMs - timestampMs)
-        let upperDelta = abs(poseFrames[upperIndex].timestampMs - timestampMs)
-        return lowerDelta <= upperDelta ? lowerIndex : upperIndex
+    private func cachePoseFrame(_ frame: PoseFrame, at index: Int) {
+        if poseFrameCache[index] == nil {
+            poseFrameCacheOrder.append(index)
+        }
+        poseFrameCache[index] = frame
+
+        let maxCacheSize = 180
+        if poseFrameCacheOrder.count > maxCacheSize {
+            let removeCount = poseFrameCacheOrder.count - maxCacheSize
+            for _ in 0..<removeCount {
+                let evicted = poseFrameCacheOrder.removeFirst()
+                poseFrameCache.removeValue(forKey: evicted)
+            }
+        }
+    }
+
+    private func loadPoseFrameSynchronously(from index: RecordingSessionRepository.PoseFrameIndex, at position: Int) -> PoseFrame? {
+        let result = repository.loadPoseFrame(from: index, at: position)
+        if case .success(let frame) = result {
+            cachePoseFrame(frame, at: position)
+            return frame
+        }
+        return nil
     }
 }

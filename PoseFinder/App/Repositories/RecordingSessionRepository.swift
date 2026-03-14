@@ -7,6 +7,48 @@ import CoreGraphics
 import Foundation
 
 struct RecordingSessionRepository {
+    struct PoseFrameIndex {
+        fileprivate struct Entry {
+            let timestampMs: Int
+            let offset: UInt64
+            let length: Int
+        }
+
+        fileprivate let fileURL: URL
+        fileprivate let entries: [Entry]
+
+        var count: Int {
+            entries.count
+        }
+
+        func closestFrameIndex(for timestampMs: Int) -> Int? {
+            guard !entries.isEmpty else { return nil }
+            if timestampMs <= entries[0].timestampMs { return 0 }
+            if timestampMs >= entries[entries.count - 1].timestampMs { return entries.count - 1 }
+
+            var low = 0
+            var high = entries.count - 1
+            // 二分探索で最も近いフレーム候補を特定する。
+            while low <= high {
+                let mid = (low + high) / 2
+                let midTs = entries[mid].timestampMs
+                if midTs == timestampMs {
+                    return mid
+                } else if midTs < timestampMs {
+                    low = mid + 1
+                } else {
+                    high = mid - 1
+                }
+            }
+
+            let lowerIndex = max(high, 0)
+            let upperIndex = min(low, entries.count - 1)
+            let lowerDelta = abs(entries[lowerIndex].timestampMs - timestampMs)
+            let upperDelta = abs(entries[upperIndex].timestampMs - timestampMs)
+            return lowerDelta <= upperDelta ? lowerIndex : upperIndex
+        }
+    }
+
     private let fileManager: FileManager
     private let decoder: JSONDecoder
     private let isoFormatter: ISO8601DateFormatter
@@ -141,6 +183,95 @@ struct RecordingSessionRepository {
             }
 
             return .success(frames.sorted(by: { $0.timestampMs < $1.timestampMs }))
+        } catch {
+            return .failure(error)
+        }
+    }
+
+    func loadPoseFrameIndex(from url: URL) -> Result<PoseFrameIndex, Error> {
+        do {
+            guard fileManager.fileExists(atPath: url.path) else {
+                throw RepositoryError.fileNotFound(url)
+            }
+
+            if let size = fileSize(at: url), size == 0 {
+                throw RepositoryError.emptyPoseFile
+            }
+
+            let handle = try FileHandle(forReadingFrom: url)
+            defer {
+                try? handle.close()
+            }
+
+            let newline = Data([0x0a])
+            var buffer = Data()
+            var lineStartOffset: UInt64 = 0
+            var entries: [PoseFrameIndex.Entry] = []
+
+            func appendEntryIfPossible(lineData: Data, offset: UInt64) {
+                guard let cleaned = cleanedLineData(from: lineData), !cleaned.isEmpty else {
+                    return
+                }
+                guard let frame = try? decodePoseFrame(from: cleaned) else {
+                    return
+                }
+                entries.append(.init(timestampMs: frame.timestampMs, offset: offset, length: lineData.count))
+            }
+
+            while true {
+                let chunk = handle.readData(ofLength: 4096)
+                if chunk.isEmpty, buffer.isEmpty { break }
+                buffer.append(chunk)
+
+                while let range = buffer.firstRange(of: newline) {
+                    let lineData = buffer.subdata(in: 0..<range.lowerBound)
+                    appendEntryIfPossible(lineData: lineData, offset: lineStartOffset)
+                    lineStartOffset += UInt64(range.upperBound)
+                    buffer.removeSubrange(0..<range.upperBound)
+                }
+
+                if chunk.isEmpty {
+                    if !buffer.isEmpty {
+                        appendEntryIfPossible(lineData: buffer, offset: lineStartOffset)
+                        lineStartOffset += UInt64(buffer.count)
+                        buffer.removeAll()
+                    }
+                    break
+                }
+            }
+
+            if entries.isEmpty {
+                throw RepositoryError.poseFrameNotFound
+            }
+
+            return .success(
+                PoseFrameIndex(
+                    fileURL: url,
+                    entries: entries.sorted(by: { $0.timestampMs < $1.timestampMs })
+                )
+            )
+        } catch {
+            return .failure(error)
+        }
+    }
+
+    func loadPoseFrame(from index: PoseFrameIndex, at position: Int) -> Result<PoseFrame, Error> {
+        do {
+            guard position >= 0, position < index.entries.count else {
+                throw RepositoryError.poseFrameNotFound
+            }
+            let entry = index.entries[position]
+
+            let handle = try FileHandle(forReadingFrom: index.fileURL)
+            defer {
+                try? handle.close()
+            }
+            try handle.seek(toOffset: entry.offset)
+            let rawData = handle.readData(ofLength: entry.length)
+            guard let cleaned = cleanedLineData(from: rawData), !cleaned.isEmpty else {
+                throw RepositoryError.poseFrameNotFound
+            }
+            return .success(try decodePoseFrame(from: cleaned))
         } catch {
             return .failure(error)
         }
