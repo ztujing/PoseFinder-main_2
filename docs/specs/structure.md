@@ -1,6 +1,6 @@
 # PoseFinder: Structure（構成・アーキテクチャ）
 
-- **最終更新日**: 2026-01-09
+- **最終更新日**: 2026-03-18
 - **正本**: `docs/specs/*`（`docs/archive/specs/*` は参考資料）
 
 ## 1. リポジトリ構成（要点）
@@ -34,7 +34,7 @@ Pods/                       # CocoaPods（ML Kit）
 
 - ViewModel: `PoseFinder/App/ViewModels/*`
   - `SessionListViewModel`: 保存済みセッション一覧をロード
-  - `SessionDetailViewModel`: セッション再読み込み、動画プレイヤ、Pose プレビュー生成
+  - `SessionDetailViewModel`: セッション再読み込み、動画プレイヤ、Pose 時刻同期表示（オンデマンド読み込み + キャッシュ）
 - Model: `PoseFinder/App/Models/*`
   - `RecordingSession`: UI で扱うセッションメタ（ファイル URL、サイズ等）
   - `PoseFrame`: Pose NDJSON の1フレーム（プレビュー用途）
@@ -44,6 +44,8 @@ Pods/                       # CocoaPods（ML Kit）
 - Repository: `PoseFinder/App/Repositories/RecordingSessionRepository.swift`
   - `Documents/Sessions/*` を走査し `session.json` を読み込む
   - `pose.ndjson` から先頭の有効 JSON 行を読み、`PoseFrame` を復元
+  - `pose.ndjson` を走査して `PoseFrameIndex`（timestamp + file offset）を構築
+  - `PoseFrameIndex` 経由で必要行のみ `PoseFrame` を復元
 - Recorder: `PoseFinder/Utils/RecordingSessionManager.swift`
   - 録画（`video.mp4`）と Pose（`pose.ndjson`）を同一セッションとして同期保存
   - 正常終了時のみ「未完了マーカー」を除去してセッションを確定
@@ -108,6 +110,8 @@ flowchart LR
     FS --> Repo[RecordingSessionRepository]
     Repo --> ListVM[SessionListViewModel]
     Repo --> DetailVM[SessionDetailViewModel]
+    Repo --> Index[PoseFrameIndex]
+    Index --> DetailVM
     DetailVM --> Player[AVPlayer]
     DetailVM --> PosePrev[PosePreviewView]
   end

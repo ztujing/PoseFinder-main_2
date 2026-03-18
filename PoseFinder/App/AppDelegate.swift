@@ -11,7 +11,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
-        copyBundleTrainingResourcesToDocumentsIfNeeded()
+        if UITestSupport.shouldSeedSession {
+            copyBundleTrainingResourcesToDocumentsIfNeeded()
+        } else {
+            DispatchQueue.global(qos: .utility).async {
+                self.copyBundleTrainingResourcesToDocumentsIfNeeded()
+            }
+        }
         seedUITestSessionIfNeeded()
         return true
     }
@@ -33,7 +39,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
             if let bundleJSON = Bundle.main.url(forResource: "training-menus", withExtension: "json") {
                 let dest = targetDir.appendingPathComponent("training-menus.json")
-                try replaceItemIfNeeded(at: dest, with: bundleJSON, fileManager: fileManager)
+                try copyItemIfMissing(at: dest, from: bundleJSON, fileManager: fileManager)
             }
 
             let rootVideoURLs = Bundle.main.urls(forResourcesWithExtension: "mp4", subdirectory: nil) ?? []
@@ -41,16 +47,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
             for videoURL in (rootVideoURLs + videosDirectoryURLs) {
                 let dest = targetVideosDir.appendingPathComponent(videoURL.lastPathComponent)
-                try replaceItemIfNeeded(at: dest, with: videoURL, fileManager: fileManager)
+                try copyItemIfMissing(at: dest, from: videoURL, fileManager: fileManager)
             }
         } catch {
             print("[AppDelegate] Failed to copy training resources: \(error)")
         }
     }
 
-    private func replaceItemIfNeeded(at destinationURL: URL, with sourceURL: URL, fileManager: FileManager) throws {
+    private func copyItemIfMissing(at destinationURL: URL, from sourceURL: URL, fileManager: FileManager) throws {
         if fileManager.fileExists(atPath: destinationURL.path) {
-            try fileManager.removeItem(at: destinationURL)
+            return
         }
 
         try fileManager.copyItem(at: sourceURL, to: destinationURL)

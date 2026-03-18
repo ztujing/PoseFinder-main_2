@@ -120,9 +120,12 @@ struct TrainingMenuDetailView: View {
     private func configureAndPlayVideo(from url: URL) {
         let currentURL = (player.currentItem?.asset as? AVURLAsset)?.url
         if currentURL != url {
-            player.replaceCurrentItem(with: AVPlayerItem(url: url))
+            let item = AVPlayerItem(url: url)
+            item.preferredForwardBufferDuration = 5
+            player.replaceCurrentItem(with: item)
         }
 
+        player.automaticallyWaitsToMinimizeStalling = true
         player.isMuted = true
         player.play()
     }

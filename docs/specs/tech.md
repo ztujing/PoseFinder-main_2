@@ -1,6 +1,6 @@
 # PoseFinder: Tech（技術仕様）
 
-- **最終更新日**: 2026-03-06
+- **最終更新日**: 2026-03-18
 - **正本**: `docs/specs/*`（`docs/archive/specs/*` は参考資料）
 
 ## 1. 対象プラットフォーム / 前提
@@ -52,9 +52,10 @@
 
 実装: `PoseFinder/Utils/PoseSerialization.swift`
 
-- 再生時処理:
-  - 全フレーム読み込み後、`t_ms` 昇順整列。
-  - AVPlayer の現在時刻に最も近いフレームを二分探索で引き当て。
+- 再生時処理（2026-03 時点）:
+  - `RecordingSessionRepository.loadPoseFrameIndex(from:)` で NDJSON の有効行を走査し、`t_ms` とファイルオフセットを `PoseFrameIndex` として保持する。
+  - `SessionDetailViewModel` は AVPlayer の現在時刻に対して `PoseFrameIndex.closestFrameIndex(for:)` で最寄りフレーム位置を求める。
+  - 必要なフレーム本体は `RecordingSessionRepository.loadPoseFrame(from:at:)` でオンデマンド復元し、前後フレームは短期キャッシュで先読みする。
   - 座標系互換: 正規化済み座標をピクセル座標に変換（points/pixels 不一致吸収）。
 
 ### 3.2 `session.json`
@@ -79,7 +80,7 @@
 ## 5. 既知の技術課題（メモ）
 
 - 計測（fps/latency/電力/温度）や OSLog 整備は未着手
-- 再生時の Pose と動画のフレーム同期は実装済み。長尺/高fpsセッション向けのメモリ最適化は未完了
+- 再生時の Pose と動画のフレーム同期は実装済み。長尺/高fpsセッション向けに、全件常駐を避けるインデックス + オンデマンド読み込みを導入済み
 
 ## 6. 参照
 
