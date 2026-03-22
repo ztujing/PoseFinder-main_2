@@ -9,18 +9,21 @@ enum PoseSerialization {
         let x: Double
         let y: Double
         let c: Double
+        let s: Double?
     }
 
     struct FramePayload: Codable {
         let tMs: Int
         let imgSize: [Int]
         let score: Double
+        let confidence: Double?
         let joints: [String: JointPayload]
 
         enum CodingKeys: String, CodingKey {
             case tMs = "t_ms"
             case imgSize = "img_size"
             case score
+            case confidence
             case joints
         }
     }
@@ -30,10 +33,12 @@ enum PoseSerialization {
         let width = max(Int(imageSize.width.rounded()), 1)
         let height = max(Int(imageSize.height.rounded()), 1)
         let joints = jointsDictionary(from: pose, imageSize: imageSize)
+        let poseScore = pose.score > 0 ? pose.score : pose.confidence
         return FramePayload(
             tMs: timestampMs,
             imgSize: [width, height],
-            score: pose.confidence,
+            score: poseScore,
+            confidence: pose.confidence,
             joints: joints
         )
     }
@@ -74,7 +79,10 @@ enum PoseSerialization {
             case .pixel:
                 normalized = normalize(joint.position, imageSize: imageSize)
             }
-            result[key] = JointPayload(x: normalized.x, y: normalized.y, c: max(0.0, min(1.0, joint.confidence)))
+            let clampedConfidence = max(0.0, min(1.0, joint.confidence))
+            let rawScore = joint.score > 0 ? joint.score : clampedConfidence
+            let clampedScore = max(0.0, min(1.0, rawScore))
+            result[key] = JointPayload(x: normalized.x, y: normalized.y, c: clampedConfidence, s: clampedScore)
         }
         return result
     }

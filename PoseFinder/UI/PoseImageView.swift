@@ -7,6 +7,99 @@
 
 import UIKit
 
+enum PoseScoreLevel: Equatable {
+    case ok
+    case caution
+    case ng
+
+    var label: String {
+        switch self {
+        case .ok:
+            return "OK"
+        case .caution:
+            return "注意"
+        case .ng:
+            return "NG"
+        }
+    }
+
+    var color: UIColor {
+        switch self {
+        case .ok:
+            return .systemGreen
+        case .caution:
+            return .systemYellow
+        case .ng:
+            return .systemRed
+        }
+    }
+}
+
+struct PoseScoreEvaluation {
+    static let okThreshold = 0.75
+    static let cautionThreshold = 0.45
+
+    static func level(for score: Double) -> PoseScoreLevel {
+        // スコア閾値に応じて3段階評価を返す。
+        if score >= okThreshold {
+            return .ok
+        }
+        if score >= cautionThreshold {
+            return .caution
+        }
+        return .ng
+    }
+
+    static func concernJointNames(in pose: Pose, limit: Int = 3) -> [Joint.Name] {
+        let candidates = pose.joints.values
+            .filter { $0.isValid }
+            .map { ($0.name, $0.score, level(for: $0.score)) }
+            .filter { $0.2 != .ok }
+            .sorted { lhs, rhs in lhs.1 < rhs.1 }
+
+        return Array(candidates.prefix(limit).map { $0.0 })
+    }
+
+    static func displayName(for jointName: Joint.Name) -> String {
+        switch jointName {
+        case .nose:
+            return "鼻"
+        case .leftEye:
+            return "左目"
+        case .rightEye:
+            return "右目"
+        case .leftEar:
+            return "左耳"
+        case .rightEar:
+            return "右耳"
+        case .leftShoulder:
+            return "左肩"
+        case .rightShoulder:
+            return "右肩"
+        case .leftElbow:
+            return "左肘"
+        case .rightElbow:
+            return "右肘"
+        case .leftWrist:
+            return "左手首"
+        case .rightWrist:
+            return "右手首"
+        case .leftHip:
+            return "左股関節"
+        case .rightHip:
+            return "右股関節"
+        case .leftKnee:
+            return "左膝"
+        case .rightKnee:
+            return "右膝"
+        case .leftAnkle:
+            return "左足首"
+        case .rightAnkle:
+            return "右足首"
+        }
+    }
+}
+
 @IBDesignable
 class PoseImageView: UIImageView {
     
@@ -40,6 +133,7 @@ class PoseImageView: UIImageView {
     // 教師と生徒の色を定義
     let teacherColor = UIColor.blue
     let studentColor = UIColor.red
+    var useLegacyJointRendering = false
     
     /// A data structure used to describe a visual connection between two joints.
     struct JointSegment {
@@ -118,6 +212,9 @@ class PoseImageView: UIImageView {
     
     // 新しいメソッド
     private func drawPose(pose: Pose, in context: CGContext, color: UIColor) {
+        let concernJointNames = Set(PoseScoreEvaluation.concernJointNames(in: pose))
+
+        // 骨格線は従来通り描画し、関節の見せ方のみ段階評価に切り替える。
         for segment in PoseImageView.jointSegments {
             let jointA = pose[segment.jointA]
             let jointB = pose[segment.jointB]
@@ -130,8 +227,14 @@ class PoseImageView: UIImageView {
         }
         
         for joint in pose.joints.values.filter({ $0.isValid }) {
-            let jointColor = colorBasedOnScore(joint.score)
+            let jointLevel = PoseScoreEvaluation.level(for: joint.score)
+            let jointColor = useLegacyJointRendering ? colorBasedOnScore(joint.score) : jointLevel.color
             draw(circle: joint, color: jointColor, in: context)
+
+            // 要注意関節のみ、リングで追加強調する。
+            if !useLegacyJointRendering, concernJointNames.contains(joint.name) {
+                drawConcernRing(around: joint, color: jointColor, in: context)
+            }
         }
     }
     
@@ -184,7 +287,17 @@ class PoseImageView: UIImageView {
         cgContext.addEllipse(in: rectangle)
         cgContext.drawPath(using: .fill)
     }
-    
+
+    private func drawConcernRing(around joint: Joint, color: UIColor, in cgContext: CGContext) {
+        cgContext.setStrokeColor(color.cgColor)
+        cgContext.setLineWidth(2.0)
+        let radius = jointRadius + 4
+        let rectangle = CGRect(x: joint.position.x - radius, y: joint.position.y - radius,
+                               width: radius * 2, height: radius * 2)
+        cgContext.addEllipse(in: rectangle)
+        cgContext.strokePath()
+    }
+
     // スコアに基づいて色を決定する補助関数
     private func colorBasedOnScore(_ score: Double) -> UIColor {
         // スコアが0から1の範囲であると仮定

@@ -12,7 +12,9 @@ struct PosePreviewView: UIViewRepresentable {
     }
 
     func makeUIView(context: Context) -> PoseImageView {
-        PoseImageView(frame: .zero)
+        let view = PoseImageView(frame: .zero)
+        view.useLegacyJointRendering = false
+        return view
     }
 
     func updateUIView(_ uiView: PoseImageView, context: Context) {
@@ -82,7 +84,8 @@ struct PosePreviewView: UIViewRepresentable {
         for (name, joint) in pose.joints {
             var newJoint = mapped[name]
             newJoint.confidence = joint.confidence
-            newJoint.score = joint.score
+            // 旧セッション互換: score が未設定(0)の場合は confidence を強調表示用スコアとして使う。
+            newJoint.score = joint.score > 0 ? joint.score : joint.confidence
             newJoint.isValid = joint.isValid
 
             guard joint.isValid else {
@@ -108,7 +111,7 @@ struct PosePreviewView: UIViewRepresentable {
         }
 
         mapped.confidence = pose.confidence
-        mapped.score = pose.score
+        mapped.score = pose.score > 0 ? pose.score : pose.confidence
         return mapped
     }
 

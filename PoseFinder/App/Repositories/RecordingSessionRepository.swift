@@ -484,12 +484,12 @@ private extension RecordingSessionRepository {
                 y: CGFloat(jointPayload.y * scaleY)
             )
             joint.confidence = jointPayload.c
-            joint.score = jointPayload.c
+            joint.score = jointPayload.s ?? jointPayload.c
             joint.isValid = jointPayload.c > 0
             pose[jointName] = joint
         }
-        pose.confidence = payload.score
-        pose.score = payload.score
+        pose.confidence = payload.confidence ?? payload.score
+        pose.score = payload.score > 0 ? payload.score : pose.confidence
 
         return PoseFrame(
             timestampMs: payload.tMs,

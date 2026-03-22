@@ -88,6 +88,7 @@ class ViewController: UIViewController {
     @IBOutlet private var movieScaledPreviewImageView: PoseImageView!
     
     @IBOutlet weak var ScoreLabel: UILabel!
+    private let legacyJointRenderingUserDefaultsKey = "pose.useLegacyJointRendering"
     private let videoCapture = VideoCapture()
     
     //    private var videoPoseNet: PoseNet!
@@ -142,6 +143,9 @@ class ViewController: UIViewController {
         
         // 追加
         setupPoseDetectors()
+        videoPreviewImageView.useLegacyJointRendering = UserDefaults.standard.bool(forKey: legacyJointRenderingUserDefaultsKey)
+        moviePreviewImageView.useLegacyJointRendering = UserDefaults.standard.bool(forKey: legacyJointRenderingUserDefaultsKey)
+        configureScoreLabelAppearance()
         setupAndBeginCapturingVideoFrames()
         setupAndBeginCapturingMovieFrames()
         NotificationCenter.default.addObserver(self,
@@ -168,6 +172,7 @@ class ViewController: UIViewController {
         
         videoPreviewImageView.frame = view.bounds
         movieScaledPreviewImageView.frame = view.bounds
+        layoutScoreLabel()
     }
     
     // 追加
@@ -489,15 +494,15 @@ extension ViewController: VideoCaptureDelegate {
             let builder = PoseBuilderV2(mlKitPose: sourcePose, configuration: self.poseBuilderConfiguration)
             
             var studentPose = builder.pose
-
-            if self.isRecordingSessionActive {
-                self.recordingSessionManager.appendPose(studentPose,
-                                                        timestamp: frameTimestamp,
-                                                        imageSize: frameSize)
-            }
             
             let scaledPoseHelper = ScaledPoseHelper(teacherPose: self.teacherPose,studentPose: studentPose)
             var (teacherScaledPose,scoredStudentPose) = scaledPoseHelper.getScaledPose()
+
+            if self.isRecordingSessionActive {
+                self.recordingSessionManager.appendPose(scoredStudentPose,
+                                                        timestamp: frameTimestamp,
+                                                        imageSize: frameSize)
+            }
 
 
             //ここまでポーズ
@@ -511,6 +516,7 @@ extension ViewController: VideoCaptureDelegate {
             
             //座標データ？
             self.videoPreviewImageView.show(scaledPose: teacherScaledPose, studentPose: scoredStudentPose, on: currentFrame, isFrameDraw: true)
+            self.updateScoreLabel(with: scoredStudentPose)
             
             self.videoCurrentFrame = nil
         }
@@ -572,8 +578,7 @@ extension ViewController: PoseNetDelegate {
             //座標データ？
             videoPreviewImageView.show(scaledPose: teacherScaledPose, studentPose: scoredStudentPose, on: currentFrame, isFrameDraw: true)
             
-            //UILabel
-            ScoreLabel.text = String(teacherScaledPose.score)
+            updateScoreLabel(with: scoredStudentPose)
             
             
         }else{
@@ -609,5 +614,55 @@ extension ViewController: PoseNetDelegate {
             }
             
         }
+    }
+}
+
+private extension ViewController {
+    func configureScoreLabelAppearance() {
+        ScoreLabel.numberOfLines = 2
+        ScoreLabel.textAlignment = .left
+        ScoreLabel.lineBreakMode = .byTruncatingTail
+        ScoreLabel.adjustsFontSizeToFitWidth = false
+        ScoreLabel.layer.cornerRadius = 12
+        ScoreLabel.layer.masksToBounds = true
+        ScoreLabel.layer.borderWidth = 1
+        ScoreLabel.layer.borderColor = UIColor.white.withAlphaComponent(0.35).cgColor
+        ScoreLabel.backgroundColor = UIColor.black.withAlphaComponent(0.55)
+    }
+
+    func layoutScoreLabel() {
+        let horizontalInset: CGFloat = 16
+        let topOffset: CGFloat = 90
+        let maxWidth = view.bounds.width - (horizontalInset * 2)
+        let width = min(maxWidth, 240)
+        let height: CGFloat = 72
+        ScoreLabel.frame = CGRect(x: horizontalInset,
+                                  y: view.safeAreaInsets.top + topOffset,
+                                  width: width,
+                                  height: height)
+    }
+
+    func updateScoreLabel(with studentPose: Pose) {
+        let level = PoseScoreEvaluation.level(for: studentPose.score)
+        let concernNames = PoseScoreEvaluation.concernJointNames(in: studentPose, limit: 2)
+            .map { PoseScoreEvaluation.displayName(for: $0) }
+        let concernText = concernNames.isEmpty ? "要注意:なし" : "要注意: \(concernNames.joined(separator: "・"))"
+        let scoreText = String(format: "%.0f%%", studentPose.score * 100)
+
+        let titleAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.monospacedDigitSystemFont(ofSize: 26, weight: .bold),
+            .foregroundColor: UIColor.white
+        ]
+        let subtitleAttributes: [NSAttributedString.Key: Any] = [
+            .font: UIFont.systemFont(ofSize: 13, weight: .semibold),
+            .foregroundColor: UIColor.white.withAlphaComponent(0.95)
+        ]
+        let combined = NSMutableAttributedString(string: " \(scoreText) \(level.label)\n", attributes: titleAttributes)
+        combined.append(NSAttributedString(string: " \(concernText)", attributes: subtitleAttributes))
+
+        ScoreLabel.attributedText = combined
+        ScoreLabel.backgroundColor = level.color.withAlphaComponent(0.28)
+        ScoreLabel.layer.borderColor = level.color.withAlphaComponent(0.9).cgColor
+        layoutScoreLabel()
     }
 }

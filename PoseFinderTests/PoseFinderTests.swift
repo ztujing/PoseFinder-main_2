@@ -12,6 +12,42 @@ import Darwin.Mach
 @testable import PoseFinder
 
 struct PoseFinderTests {
+    @Test func poseScoreLevelBoundary_isClassifiedAsExpected() throws {
+        #expect(PoseScoreEvaluation.level(for: 0.90) == .ok)
+        #expect(PoseScoreEvaluation.level(for: PoseScoreEvaluation.okThreshold) == .ok)
+        #expect(PoseScoreEvaluation.level(for: 0.60) == .caution)
+        #expect(PoseScoreEvaluation.level(for: PoseScoreEvaluation.cautionThreshold) == .caution)
+        #expect(PoseScoreEvaluation.level(for: 0.10) == .ng)
+    }
+
+    @Test func concernJointNames_returnsLowScoreJointsFirst() throws {
+        var pose = Pose()
+
+        var rightShoulder = pose[.rightShoulder]
+        rightShoulder.isValid = true
+        rightShoulder.score = 0.20
+        pose[.rightShoulder] = rightShoulder
+
+        var rightElbow = pose[.rightElbow]
+        rightElbow.isValid = true
+        rightElbow.score = 0.55
+        pose[.rightElbow] = rightElbow
+
+        var rightWrist = pose[.rightWrist]
+        rightWrist.isValid = true
+        rightWrist.score = 0.40
+        pose[.rightWrist] = rightWrist
+
+        var leftShoulder = pose[.leftShoulder]
+        leftShoulder.isValid = true
+        leftShoulder.score = 0.88
+        pose[.leftShoulder] = leftShoulder
+
+        let concerns = PoseScoreEvaluation.concernJointNames(in: pose, limit: 2)
+        #expect(concerns.count == 2)
+        #expect(concerns[0] == .rightShoulder)
+        #expect(concerns[1] == .rightWrist)
+    }
 
     @Test func poseFrameIndexBuildsAndFindsClosestFrame() throws {
         let fileURL = try makePoseFile(
