@@ -82,6 +82,11 @@ class ViewController: UIViewController {
         case cancelled
     }
 
+    private enum StartTriggerSource {
+        case countdown
+        case manual
+    }
+
     /// The view the controller uses to visualize the detected poses.
     @IBOutlet private var videoPreviewImageView: PoseImageView!
     @IBOutlet private var moviePreviewImageView: PoseImageView!
@@ -119,6 +124,13 @@ class ViewController: UIViewController {
     private var hasRequestedSessionCancellation = false
     private var recordingState: RecordingState = .idle
     private var shouldMarkSessionIncomplete = false
+
+    private let startCountdownLabel = UILabel()
+    private let manualStartButton = UIButton(type: .system)
+    private var startCountdownTimer: Timer?
+    private var remainingCountdownSeconds = 0
+    private var hasStartedByTrigger = false
+    private let startCountdownDurationSeconds = 10
     
     //teacherScaledPoseプロパティを追加
     var teacherPose: Pose = Pose()
@@ -146,6 +158,7 @@ class ViewController: UIViewController {
         videoPreviewImageView.useLegacyJointRendering = UserDefaults.standard.bool(forKey: legacyJointRenderingUserDefaultsKey)
         moviePreviewImageView.useLegacyJointRendering = UserDefaults.standard.bool(forKey: legacyJointRenderingUserDefaultsKey)
         configureScoreLabelAppearance()
+        configureStartTriggerUI()
         setupAndBeginCapturingVideoFrames()
         setupAndBeginCapturingMovieFrames()
         NotificationCenter.default.addObserver(self,
@@ -173,6 +186,7 @@ class ViewController: UIViewController {
         videoPreviewImageView.frame = view.bounds
         movieScaledPreviewImageView.frame = view.bounds
         layoutScoreLabel()
+        layoutStartTriggerUI()
     }
     
     // 追加
@@ -266,9 +280,8 @@ class ViewController: UIViewController {
         self.playerView.playerLayer = self.playerLayer
         self.playerView.layer.insertSublayer(playerLayer, at: 0)
 
-        self.player.play()
-
-        startRecordingSession()
+        self.player.pause()
+        beginStartCountdown()
 
 
 
@@ -321,6 +334,8 @@ class ViewController: UIViewController {
     }
 
     @objc private func handlePlaybackDidFinish(_ notification: Notification) {
+        startCountdownTimer?.invalidate()
+        startCountdownTimer = nil
         recordingState = .stopping
         shouldMarkSessionIncomplete = false
         stopRecordingSession()
@@ -330,6 +345,8 @@ class ViewController: UIViewController {
         guard !hasRequestedSessionCancellation else { return }
         hasRequestedSessionCancellation = true
         isRecordingSessionActive = false
+        startCountdownTimer?.invalidate()
+        startCountdownTimer = nil
         recordingSessionManager.cancel()
         player?.pause()
         shouldMarkSessionIncomplete = false
@@ -350,6 +367,8 @@ class ViewController: UIViewController {
     }
 
     override func viewWillDisappear(_ animated: Bool) {
+        startCountdownTimer?.invalidate()
+        startCountdownTimer = nil
         if isRecordingSessionActive && !hasRequestedSessionCancellation && recordingState == .recording {
             stopRecordingSession()
         }
@@ -380,6 +399,10 @@ class ViewController: UIViewController {
         }
         
         algorithm = selectedAlgorithm
+    }
+
+    @objc private func handleManualStartButtonTapped() {
+        beginRecordingFromTrigger(.manual)
     }
 }
 
@@ -618,6 +641,84 @@ extension ViewController: PoseNetDelegate {
 }
 
 private extension ViewController {
+    func configureStartTriggerUI() {
+        startCountdownLabel.textAlignment = .center
+        startCountdownLabel.textColor = .white
+        startCountdownLabel.font = .monospacedDigitSystemFont(ofSize: 34, weight: .bold)
+        startCountdownLabel.backgroundColor = UIColor.black.withAlphaComponent(0.45)
+        startCountdownLabel.layer.cornerRadius = 10
+        startCountdownLabel.layer.masksToBounds = true
+        startCountdownLabel.isHidden = true
+        view.addSubview(startCountdownLabel)
+
+        manualStartButton.setTitle("今すぐ開始", for: .normal)
+        manualStartButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .bold)
+        manualStartButton.setTitleColor(.white, for: .normal)
+        manualStartButton.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.9)
+        manualStartButton.layer.cornerRadius = 10
+        manualStartButton.layer.masksToBounds = true
+        manualStartButton.isHidden = true
+        manualStartButton.addTarget(self, action: #selector(handleManualStartButtonTapped), for: .touchUpInside)
+        view.addSubview(manualStartButton)
+    }
+
+    func layoutStartTriggerUI() {
+        let labelWidth: CGFloat = 140
+        let labelHeight: CGFloat = 56
+        startCountdownLabel.frame = CGRect(x: (view.bounds.width - labelWidth) / 2,
+                                           y: view.safeAreaInsets.top + 132,
+                                           width: labelWidth,
+                                           height: labelHeight)
+
+        let buttonWidth: CGFloat = 140
+        let buttonHeight: CGFloat = 44
+        manualStartButton.frame = CGRect(x: (view.bounds.width - buttonWidth) / 2,
+                                         y: startCountdownLabel.frame.maxY + 12,
+                                         width: buttonWidth,
+                                         height: buttonHeight)
+    }
+
+    func beginStartCountdown() {
+        guard recordingState == .idle else { return }
+        hasStartedByTrigger = false
+        remainingCountdownSeconds = startCountdownDurationSeconds
+        startCountdownLabel.isHidden = false
+        manualStartButton.isHidden = false
+        updateCountdownLabelText()
+        startCountdownTimer?.invalidate()
+        startCountdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            self?.tickStartCountdown()
+        }
+    }
+
+    func tickStartCountdown() {
+        remainingCountdownSeconds -= 1
+        if remainingCountdownSeconds <= 0 {
+            beginRecordingFromTrigger(.countdown)
+            return
+        }
+        updateCountdownLabelText()
+    }
+
+    func updateCountdownLabelText() {
+        startCountdownLabel.text = "開始まで \(remainingCountdownSeconds)"
+    }
+
+    private func beginRecordingFromTrigger(_ source: StartTriggerSource) {
+        guard !hasStartedByTrigger else { return }
+        hasStartedByTrigger = true
+        startCountdownTimer?.invalidate()
+        startCountdownTimer = nil
+        startCountdownLabel.isHidden = true
+        manualStartButton.isHidden = true
+
+        // 開始トリガーを一本化し、録画開始と再生開始を同時に揃える。
+        player?.seek(to: .zero)
+        player?.play()
+        startRecordingSession()
+        print("Recording started by trigger: \(source)")
+    }
+
     func configureScoreLabelAppearance() {
         ScoreLabel.numberOfLines = 2
         ScoreLabel.textAlignment = .left
