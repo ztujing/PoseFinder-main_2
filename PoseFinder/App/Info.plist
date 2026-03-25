@@ -22,6 +22,8 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>This app uses the camera to capture input for the PoseNet model </string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>This app uses the microphone level only for optional auto-start trigger.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

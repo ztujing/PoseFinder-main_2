@@ -76,6 +76,7 @@ final class TeacherStudentRatio {
 class ViewController: UIViewController {
     private enum RecordingState {
         case idle
+        case countdown
         case recording
         case stopping
         case completed
@@ -85,6 +86,7 @@ class ViewController: UIViewController {
     private enum StartTriggerSource {
         case countdown
         case manual
+        case audioThreshold
     }
 
     /// The view the controller uses to visualize the detected poses.
@@ -94,6 +96,8 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var ScoreLabel: UILabel!
     private let legacyJointRenderingUserDefaultsKey = "pose.useLegacyJointRendering"
+    private let autoStartEnabledUserDefaultsKey = "recording.autoStartEnabled"
+    private let autoStartThresholdUserDefaultsKey = "recording.autoStartThreshold"
     private let videoCapture = VideoCapture()
     
     //    private var videoPoseNet: PoseNet!
@@ -127,10 +131,22 @@ class ViewController: UIViewController {
 
     private let startCountdownLabel = UILabel()
     private let manualStartButton = UIButton(type: .system)
+    private let autoStartToggleLabel = UILabel()
+    private let autoStartSwitch = UISwitch()
+    private let autoStartThresholdSlider = UISlider()
+    private let autoStartThresholdLabel = UILabel()
+    private let autoStartStatusLabel = UILabel()
+    private let startHintLabel = UILabel()
     private var startCountdownTimer: Timer?
+    private var autoStartTimeoutTimer: Timer?
+    private var audioMeterTimer: Timer?
+    private var audioMeterRecorder: AVAudioRecorder?
     private var remainingCountdownSeconds = 0
     private var hasStartedByTrigger = false
+    private var hasAutoStartTimedOut = false
     private let startCountdownDurationSeconds = 10
+    private let autoStartTimeoutSeconds = 8
+    private let defaultAutoStartThreshold: Float = 0.35
     
     //teacherScaledPoseプロパティを追加
     var teacherPose: Pose = Pose()
@@ -159,6 +175,7 @@ class ViewController: UIViewController {
         moviePreviewImageView.useLegacyJointRendering = UserDefaults.standard.bool(forKey: legacyJointRenderingUserDefaultsKey)
         configureScoreLabelAppearance()
         configureStartTriggerUI()
+        loadAutoStartSettings()
         setupAndBeginCapturingVideoFrames()
         setupAndBeginCapturingMovieFrames()
         NotificationCenter.default.addObserver(self,
@@ -176,6 +193,7 @@ class ViewController: UIViewController {
     }
 
     deinit {
+        stopAutoStartMonitoring()
         NotificationCenter.default.removeObserver(self)
     }
     
@@ -334,6 +352,7 @@ class ViewController: UIViewController {
     }
 
     @objc private func handlePlaybackDidFinish(_ notification: Notification) {
+        stopAutoStartMonitoring()
         startCountdownTimer?.invalidate()
         startCountdownTimer = nil
         recordingState = .stopping
@@ -345,6 +364,7 @@ class ViewController: UIViewController {
         guard !hasRequestedSessionCancellation else { return }
         hasRequestedSessionCancellation = true
         isRecordingSessionActive = false
+        stopAutoStartMonitoring()
         startCountdownTimer?.invalidate()
         startCountdownTimer = nil
         recordingSessionManager.cancel()
@@ -367,6 +387,7 @@ class ViewController: UIViewController {
     }
 
     override func viewWillDisappear(_ animated: Bool) {
+        stopAutoStartMonitoring()
         startCountdownTimer?.invalidate()
         startCountdownTimer = nil
         if isRecordingSessionActive && !hasRequestedSessionCancellation && recordingState == .recording {
@@ -644,10 +665,12 @@ private extension ViewController {
     func configureStartTriggerUI() {
         startCountdownLabel.textAlignment = .center
         startCountdownLabel.textColor = .white
-        startCountdownLabel.font = .monospacedDigitSystemFont(ofSize: 34, weight: .bold)
+        startCountdownLabel.font = .monospacedDigitSystemFont(ofSize: 28, weight: .bold)
         startCountdownLabel.backgroundColor = UIColor.black.withAlphaComponent(0.45)
         startCountdownLabel.layer.cornerRadius = 10
         startCountdownLabel.layer.masksToBounds = true
+        startCountdownLabel.adjustsFontSizeToFitWidth = true
+        startCountdownLabel.minimumScaleFactor = 0.75
         startCountdownLabel.isHidden = true
         view.addSubview(startCountdownLabel)
 
@@ -660,13 +683,60 @@ private extension ViewController {
         manualStartButton.isHidden = true
         manualStartButton.addTarget(self, action: #selector(handleManualStartButtonTapped), for: .touchUpInside)
         view.addSubview(manualStartButton)
+
+        startHintLabel.font = .systemFont(ofSize: 13, weight: .semibold)
+        startHintLabel.textColor = UIColor.white.withAlphaComponent(0.95)
+        startHintLabel.textAlignment = .center
+        startHintLabel.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        startHintLabel.layer.cornerRadius = 8
+        startHintLabel.layer.masksToBounds = true
+        startHintLabel.text = "迷ったら「今すぐ開始」を押してください"
+        startHintLabel.isHidden = true
+        view.addSubview(startHintLabel)
+
+        autoStartToggleLabel.text = "自動開始"
+        autoStartToggleLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        autoStartToggleLabel.textColor = .white
+        autoStartToggleLabel.backgroundColor = UIColor.clear
+        autoStartToggleLabel.isHidden = true
+        view.addSubview(autoStartToggleLabel)
+
+        autoStartSwitch.onTintColor = UIColor.systemGreen
+        autoStartSwitch.isHidden = true
+        autoStartSwitch.addTarget(self, action: #selector(handleAutoStartSwitchChanged), for: .valueChanged)
+        view.addSubview(autoStartSwitch)
+
+        autoStartThresholdSlider.minimumValue = 0.05
+        autoStartThresholdSlider.maximumValue = 1.0
+        autoStartThresholdSlider.isContinuous = true
+        autoStartThresholdSlider.isHidden = true
+        autoStartThresholdSlider.addTarget(self, action: #selector(handleAutoStartThresholdChanged), for: .valueChanged)
+        view.addSubview(autoStartThresholdSlider)
+
+        autoStartThresholdLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        autoStartThresholdLabel.textColor = UIColor.white.withAlphaComponent(0.9)
+        autoStartThresholdLabel.isHidden = true
+        view.addSubview(autoStartThresholdLabel)
+
+        autoStartStatusLabel.font = .systemFont(ofSize: 12, weight: .semibold)
+        autoStartStatusLabel.textColor = UIColor.white.withAlphaComponent(0.9)
+        autoStartStatusLabel.backgroundColor = UIColor.black.withAlphaComponent(0.35)
+        autoStartStatusLabel.layer.cornerRadius = 8
+        autoStartStatusLabel.layer.masksToBounds = true
+        autoStartStatusLabel.textAlignment = .center
+        autoStartStatusLabel.numberOfLines = 1
+        autoStartStatusLabel.adjustsFontSizeToFitWidth = true
+        autoStartStatusLabel.minimumScaleFactor = 0.8
+        autoStartStatusLabel.isHidden = true
+        view.addSubview(autoStartStatusLabel)
     }
 
     func layoutStartTriggerUI() {
-        let labelWidth: CGFloat = 140
+        let labelWidth: CGFloat = 220
         let labelHeight: CGFloat = 56
+        let topBase = max(view.safeAreaInsets.top + 180, ScoreLabel.frame.maxY + 20)
         startCountdownLabel.frame = CGRect(x: (view.bounds.width - labelWidth) / 2,
-                                           y: view.safeAreaInsets.top + 132,
+                                           y: topBase,
                                            width: labelWidth,
                                            height: labelHeight)
 
@@ -676,24 +746,69 @@ private extension ViewController {
                                          y: startCountdownLabel.frame.maxY + 12,
                                          width: buttonWidth,
                                          height: buttonHeight)
+
+        let hintWidth = min(view.bounds.width - 40, 320)
+        startHintLabel.frame = CGRect(x: (view.bounds.width - hintWidth) / 2,
+                                      y: manualStartButton.frame.maxY + 10,
+                                      width: hintWidth,
+                                      height: 28)
+
+        autoStartToggleLabel.frame = CGRect(x: manualStartButton.frame.minX - 12,
+                                            y: startHintLabel.frame.maxY + 10,
+                                            width: 76,
+                                            height: 30)
+        autoStartSwitch.frame = CGRect(x: autoStartToggleLabel.frame.maxX + 4,
+                                       y: autoStartToggleLabel.frame.minY - 1,
+                                       width: 52,
+                                       height: 32)
+
+        let sliderY = autoStartToggleLabel.frame.maxY + 8
+        let sliderWidth = min(view.bounds.width - 40, 260)
+        autoStartThresholdSlider.frame = CGRect(x: (view.bounds.width - sliderWidth) / 2,
+                                                y: sliderY,
+                                                width: sliderWidth,
+                                                height: 28)
+        autoStartThresholdLabel.frame = CGRect(x: autoStartThresholdSlider.frame.minX,
+                                               y: autoStartThresholdSlider.frame.maxY + 4,
+                                               width: autoStartThresholdSlider.frame.width,
+                                               height: 18)
+        autoStartStatusLabel.frame = CGRect(x: autoStartThresholdSlider.frame.minX,
+                                            y: autoStartThresholdLabel.frame.maxY + 8,
+                                            width: autoStartThresholdSlider.frame.width,
+                                            height: 26)
     }
 
     func beginStartCountdown() {
         guard recordingState == .idle else { return }
+        recordingState = .countdown
         hasStartedByTrigger = false
+        hasAutoStartTimedOut = false
         remainingCountdownSeconds = startCountdownDurationSeconds
+        manualStartButton.backgroundColor = UIColor.systemBlue.withAlphaComponent(0.9)
         startCountdownLabel.isHidden = false
         manualStartButton.isHidden = false
+        startHintLabel.isHidden = false
+        autoStartToggleLabel.isHidden = false
+        autoStartSwitch.isHidden = false
         updateCountdownLabelText()
+        updateAutoStartThresholdLabel()
+        updateAutoStartControlVisibility()
         startCountdownTimer?.invalidate()
         startCountdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
             self?.tickStartCountdown()
         }
+        startAutoStartMonitoringIfNeeded()
     }
 
     func tickStartCountdown() {
         remainingCountdownSeconds -= 1
         if remainingCountdownSeconds <= 0 {
+            if autoStartSwitch.isOn && hasAutoStartTimedOut {
+                startCountdownTimer?.invalidate()
+                startCountdownTimer = nil
+                startCountdownLabel.text = "手動で開始してください"
+                return
+            }
             beginRecordingFromTrigger(.countdown)
             return
         }
@@ -701,22 +816,192 @@ private extension ViewController {
     }
 
     func updateCountdownLabelText() {
-        startCountdownLabel.text = "開始まで \(remainingCountdownSeconds)"
+        startCountdownLabel.text = "開始まで \(remainingCountdownSeconds)秒"
     }
 
     private func beginRecordingFromTrigger(_ source: StartTriggerSource) {
+        guard recordingState == .countdown || recordingState == .idle else { return }
         guard !hasStartedByTrigger else { return }
         hasStartedByTrigger = true
+        stopAutoStartMonitoring()
         startCountdownTimer?.invalidate()
         startCountdownTimer = nil
         startCountdownLabel.isHidden = true
         manualStartButton.isHidden = true
+        startHintLabel.isHidden = true
+        autoStartToggleLabel.isHidden = true
+        autoStartSwitch.isHidden = true
+        autoStartThresholdSlider.isHidden = true
+        autoStartThresholdLabel.isHidden = true
+        autoStartStatusLabel.isHidden = true
 
         // 開始トリガーを一本化し、録画開始と再生開始を同時に揃える。
         player?.seek(to: .zero)
         player?.play()
         startRecordingSession()
         print("Recording started by trigger: \(source)")
+    }
+
+    // --- Auto Start Monitoring ---
+
+    @objc func handleAutoStartSwitchChanged() {
+        UserDefaults.standard.set(autoStartSwitch.isOn, forKey: autoStartEnabledUserDefaultsKey)
+        updateAutoStartControlVisibility()
+        if recordingState == .countdown {
+            hasAutoStartTimedOut = false
+            startAutoStartMonitoringIfNeeded()
+        }
+    }
+
+    @objc func handleAutoStartThresholdChanged() {
+        UserDefaults.standard.set(autoStartThresholdSlider.value, forKey: autoStartThresholdUserDefaultsKey)
+        updateAutoStartThresholdLabel()
+    }
+
+    func loadAutoStartSettings() {
+        let defaults = UserDefaults.standard
+        if defaults.object(forKey: autoStartEnabledUserDefaultsKey) == nil {
+            defaults.set(false, forKey: autoStartEnabledUserDefaultsKey)
+        }
+        if defaults.object(forKey: autoStartThresholdUserDefaultsKey) == nil {
+            defaults.set(defaultAutoStartThreshold, forKey: autoStartThresholdUserDefaultsKey)
+        }
+
+        autoStartSwitch.isOn = defaults.bool(forKey: autoStartEnabledUserDefaultsKey)
+        let threshold = defaults.float(forKey: autoStartThresholdUserDefaultsKey)
+        autoStartThresholdSlider.value = max(autoStartThresholdSlider.minimumValue,
+                                             min(autoStartThresholdSlider.maximumValue, threshold))
+        updateAutoStartThresholdLabel()
+    }
+
+    func updateAutoStartThresholdLabel() {
+        let percent = Int((autoStartThresholdSlider.value * 100).rounded())
+        autoStartThresholdLabel.text = "閾値: \(percent)%"
+    }
+
+    func updateAutoStartControlVisibility() {
+        let shouldShowDetail = autoStartSwitch.isOn && (recordingState == .countdown)
+        autoStartThresholdSlider.isHidden = !shouldShowDetail
+        autoStartThresholdLabel.isHidden = !shouldShowDetail
+        autoStartStatusLabel.isHidden = !shouldShowDetail
+    }
+
+    func startAutoStartMonitoringIfNeeded() {
+        stopAutoStartMonitoring()
+
+        guard recordingState == .countdown else { return }
+        guard autoStartSwitch.isOn else {
+            autoStartStatusLabel.text = nil
+            return
+        }
+
+        let audioSession = AVAudioSession.sharedInstance()
+        switch audioSession.recordPermission {
+        case .granted:
+            break
+        case .denied:
+            autoStartStatusLabel.text = "マイク許可が必要です"
+            return
+        case .undetermined:
+            autoStartStatusLabel.text = "マイク許可を確認中"
+            audioSession.requestRecordPermission { [weak self] granted in
+                DispatchQueue.main.async {
+                    guard let self else { return }
+                    self.autoStartStatusLabel.text = granted ? "待機中（音量監視ON）" : "マイク許可が必要です"
+                    if granted {
+                        self.startAutoStartMonitoringIfNeeded()
+                    }
+                }
+            }
+            return
+        @unknown default:
+            autoStartStatusLabel.text = "音量監視を開始できません"
+            return
+        }
+
+        guard prepareAudioMeterRecorder() else {
+            autoStartStatusLabel.text = "音量監視を開始できません"
+            return
+        }
+
+        autoStartStatusLabel.text = "待機中（音量監視ON）"
+        audioMeterTimer = Timer.scheduledTimer(withTimeInterval: 0.12, repeats: true) { [weak self] _ in
+            self?.pollAudioLevelAndStartIfNeeded()
+        }
+        autoStartTimeoutTimer = Timer.scheduledTimer(withTimeInterval: TimeInterval(autoStartTimeoutSeconds),
+                                                     repeats: false) { [weak self] _ in
+            self?.handleAutoStartTimeout()
+        }
+    }
+
+    func stopAutoStartMonitoring() {
+        audioMeterTimer?.invalidate()
+        audioMeterTimer = nil
+        autoStartTimeoutTimer?.invalidate()
+        autoStartTimeoutTimer = nil
+        audioMeterRecorder?.stop()
+        audioMeterRecorder = nil
+    }
+
+    func prepareAudioMeterRecorder() -> Bool {
+        do {
+            let audioSession = AVAudioSession.sharedInstance()
+            try audioSession.setCategory(.playAndRecord, options: [.defaultToSpeaker, .mixWithOthers])
+            try audioSession.setActive(true)
+
+            let settings: [String: Any] = [
+                AVFormatIDKey: Int(kAudioFormatAppleLossless),
+                AVSampleRateKey: 44100,
+                AVNumberOfChannelsKey: 1,
+                AVEncoderAudioQualityKey: AVAudioQuality.min.rawValue
+            ]
+            let meterURL = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("autostart-meter.caf")
+            audioMeterRecorder = try AVAudioRecorder(url: meterURL, settings: settings)
+            audioMeterRecorder?.isMeteringEnabled = true
+            return audioMeterRecorder?.record() ?? false
+        } catch {
+            print("Audio meter setup failed: \(error)")
+            return false
+        }
+    }
+
+    func pollAudioLevelAndStartIfNeeded() {
+        guard recordingState == .countdown else { return }
+        guard autoStartSwitch.isOn else { return }
+
+        audioMeterRecorder?.updateMeters()
+        let power = audioMeterRecorder?.averagePower(forChannel: 0) ?? -160.0
+        let normalizedLevel = normalizedAudioLevel(fromDecibel: power)
+        let currentPercent = Int((normalizedLevel * 100).rounded())
+        autoStartStatusLabel.text = "音量 \(currentPercent)% / 閾値 \(Int((autoStartThresholdSlider.value * 100).rounded()))%"
+
+        if normalizedLevel >= autoStartThresholdSlider.value {
+            beginRecordingFromTrigger(.audioThreshold)
+        }
+    }
+
+    func normalizedAudioLevel(fromDecibel value: Float) -> Float {
+        let minDB: Float = -60.0
+        if value <= minDB { return 0.0 }
+        if value >= 0.0 { return 1.0 }
+        return (value - minDB) / abs(minDB)
+    }
+
+    func handleAutoStartTimeout() {
+        guard recordingState == .countdown else { return }
+        guard !hasStartedByTrigger else { return }
+        guard autoStartSwitch.isOn else { return }
+
+        hasAutoStartTimedOut = true
+        audioMeterTimer?.invalidate()
+        audioMeterTimer = nil
+        autoStartTimeoutTimer?.invalidate()
+        autoStartTimeoutTimer = nil
+        audioMeterRecorder?.stop()
+        audioMeterRecorder = nil
+
+        manualStartButton.backgroundColor = UIColor.systemOrange.withAlphaComponent(0.95)
+        autoStartStatusLabel.text = "自動開始タイムアウト"
     }
 
     func configureScoreLabelAppearance() {
